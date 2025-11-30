@@ -14,6 +14,8 @@ import java.util.List;
  */
 public class Enterprise {
 //Rijurik_Saha_002525961
+    
+    
     private String name;
     private EnterpriseType enterpriseType;
     private List<Organization> organizations;
