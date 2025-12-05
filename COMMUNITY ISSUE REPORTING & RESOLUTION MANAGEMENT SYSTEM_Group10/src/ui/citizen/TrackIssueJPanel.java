@@ -3,19 +3,133 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package ui.citizen;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import model.ecosystem.EcoSystem;
+import model.userAccount.UserAccount;
+import model.workQueue.WorkRequest;
+import model.enterprise.Enterprise;
+import model.organization.Organization;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
- * @author RIO
+ * @author Hp
  */
 public class TrackIssueJPanel extends javax.swing.JPanel {
-
+ private javax.swing.JPanel workArea;
+    private model.ecosystem.EcoSystem ecoSystem;
+    private model.userAccount.UserAccount userAccount;
+    
+   
+    private DefaultTableModel tableModel;
+    
     /**
      * Creates new form TrackIssueJPanel
      */
-    public TrackIssueJPanel() {
+    public TrackIssueJPanel(javax.swing.JPanel workArea, 
+                           model.ecosystem.EcoSystem ecoSystem, 
+                           model.userAccount.UserAccount account) {
+        
+        this.workArea = workArea;  // ← Changed
+    this.ecoSystem = ecoSystem;
+    this.userAccount = account;
         initComponents();
+       
+          setupTable();
+        loadIssues();
+        
     }
+    
+    
+    private void setupTable() {
+    // Get the table model from the table that was created in Design Mode
+    tableModel = (DefaultTableModel) tblIssues.getModel();
+    
+    // Clear any existing rows
+    tableModel.setRowCount(0);
+    
+    // Set table properties
+    tblIssues.setRowHeight(25);
+    tblIssues.getTableHeader().setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
+}
+
+    private void loadIssues() {
+        tableModel.setRowCount(0);
+        
+        if (userAccount == null || userAccount.getPerson() == null) {
+            JOptionPane.showMessageDialog(this, 
+                "User account not found!", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        String citizenId = userAccount.getPerson().getPersonId();
+        List<WorkRequest> userRequests = new ArrayList<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        
+        try {
+            for (model.network.Network network : ecoSystem.getNetworks()) {
+                for (Enterprise enterprise : network.getEnterprises()) {
+                    for (Organization org : enterprise.getOrganizations()) {
+                        for (WorkRequest request : org.getWorkQueue().getWorkRequests()) {
+                            if (request.getCitizenId() != null && 
+                                request.getCitizenId().equals(citizenId)) {
+                                userRequests.add(request);
+                            }
+                        }
+                    }
+                }
+            }
+            
+            for (WorkRequest request : userRequests) {
+                Object[] row = {
+                    request.getRequestId(),
+                    request.getIssueType() != null ? request.getIssueType().getValue() : "N/A",
+                    request.getPriority() != null ? request.getPriority().getValue() : "N/A",
+                    request.getStatus() != null ? request.getStatus().getValue() : "N/A",
+                    request.getRequestDate() != null ? dateFormat.format(request.getRequestDate()) : "N/A",
+                    request.getLocation() != null ? request.getLocation().getStreet() : "N/A"
+                };
+                tableModel.addRow(row);
+            }
+            
+            lblTotalIssues.setText("Total Issues: " + userRequests.size());
+            
+            if (userRequests.isEmpty()) {
+                JOptionPane.showMessageDialog(this, 
+                    "You haven't submitted any issues yet.\nClick 'Report New Issue' to submit one!", 
+                    "No Issues Found", 
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error loading issues: " + e.getMessage(), 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    private void refreshTable() {
+        loadIssues();
+        JOptionPane.showMessageDialog(this, 
+            "Issues refreshed successfully!", 
+            "Success", 
+            JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void goBack() {
+        workArea.remove(this);
+        CardLayout layout = (CardLayout) workArea.getLayout();
+        layout.show(workArea, "Welcome");
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -26,28 +140,146 @@ public class TrackIssueJPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        topPanel = new javax.swing.JPanel();
+        lblTitle = new javax.swing.JLabel();
+        lblTotalIssues = new javax.swing.JLabel();
+        scrollPane = new javax.swing.JScrollPane();
+        tblIssues = new javax.swing.JTable();
+        bottomPanel = new javax.swing.JPanel();
+        btnRefresh = new javax.swing.JButton();
+        btnBack = new javax.swing.JButton();
+
+        setLayout(new java.awt.BorderLayout());
+
+        lblTitle.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        lblTitle.setText("Track My Issues");
+
+        lblTotalIssues.setText("Total Issues: 0");
+
+        javax.swing.GroupLayout topPanelLayout = new javax.swing.GroupLayout(topPanel);
+        topPanel.setLayout(topPanelLayout);
+        topPanelLayout.setHorizontalGroup(
+            topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(topPanelLayout.createSequentialGroup()
+                .addGap(231, 231, 231)
+                .addGroup(topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTitle)
+                    .addComponent(lblTotalIssues, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(190, Short.MAX_VALUE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        topPanelLayout.setVerticalGroup(
+            topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(topPanelLayout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(lblTitle)
+                .addGap(18, 18, 18)
+                .addComponent(lblTotalIssues)
+                .addContainerGap(34, Short.MAX_VALUE))
         );
+
+        add(topPanel, java.awt.BorderLayout.PAGE_START);
+
+        tblIssues.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Request ID", "Issue Type", "Priority", "Status", "Date", "Location"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        scrollPane.setViewportView(tblIssues);
+
+        add(scrollPane, java.awt.BorderLayout.CENTER);
+
+        btnRefresh.setText("Refresh");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
+        btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout bottomPanelLayout = new javax.swing.GroupLayout(bottomPanel);
+        bottomPanel.setLayout(bottomPanelLayout);
+        bottomPanelLayout.setHorizontalGroup(
+            bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bottomPanelLayout.createSequentialGroup()
+                .addGap(166, 166, 166)
+                .addComponent(btnRefresh)
+                .addGap(18, 18, 18)
+                .addComponent(btnBack)
+                .addContainerGap(216, Short.MAX_VALUE))
+        );
+        bottomPanelLayout.setVerticalGroup(
+            bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bottomPanelLayout.createSequentialGroup()
+                .addContainerGap(40, Short.MAX_VALUE)
+                .addGroup(bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRefresh)
+                    .addComponent(btnBack))
+                .addGap(37, 37, 37))
+        );
+
+        add(bottomPanel, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+loadIssues();
+    javax.swing.JOptionPane.showMessageDialog(this, 
+        "Issues refreshed successfully!", 
+        "Success", 
+        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+ try {
+        workArea.remove(this);
+        CardLayout layout = (CardLayout) workArea.getLayout();
+        layout.first(workArea); // ← Changed from previous() to first()
+    } catch (Exception e) {
+        // If CardLayout fails, just remove the panel
+        workArea.remove(this);
+        workArea.revalidate();
+        workArea.repaint();
+    }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnBackActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel bottomPanel;
+    private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnRefresh;
+    private javax.swing.JLabel lblTitle;
+    private javax.swing.JLabel lblTotalIssues;
+    private javax.swing.JScrollPane scrollPane;
+    private javax.swing.JTable tblIssues;
+    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
-private javax.swing.JPanel userProcessContainer;
-    private model.ecosystem.EcoSystem ecoSystem;
-
-    public TrackIssueJPanel(javax.swing.JPanel userProcessContainer, model.ecosystem.EcoSystem ecoSystem) {
-        this.userProcessContainer = userProcessContainer;
-        this.ecoSystem = ecoSystem;
-        initComponents();
-    }
-
 }
