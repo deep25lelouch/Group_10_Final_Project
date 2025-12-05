@@ -4,18 +4,57 @@
  */
 package ui.citizen;
 
+import javax.swing.JOptionPane;
+import javax.swing.*;
+import java.awt.*;
+import model.ecosystem.EcoSystem;
+import model.userAccount.UserAccount;
+import model.workQueue.WorkRequest;
+import model.location.Location;
+import util.enums.IssueType;
+import util.enums.Priority;
+
 /**
  *
  * @author RIO
  */
 public class ReportIssueJPanel extends javax.swing.JPanel {
-
+ private javax.swing.JPanel userProcessContainer;
+    private model.ecosystem.EcoSystem ecoSystem; 
+ private javax.swing.JPanel workArea;
+   
+    private model.userAccount.UserAccount userAccount;
     /**
      * Creates new form ReportIssueJPanel
      */
-    public ReportIssueJPanel() {
-        initComponents();
-    }
+
+public ReportIssueJPanel(javax.swing.JPanel workArea, 
+                            model.ecosystem.EcoSystem ecoSystem, 
+                            model.userAccount.UserAccount account) {
+     this.workArea = workArea;
+        this.ecoSystem = ecoSystem;
+        this.userAccount = account;
+    
+    initComponents(); // This line is already there
+    
+    loadDropdowns();
+}
+private void loadDropdowns() {
+    cmbIssueType.removeAllItems();
+        for (IssueType type : IssueType.values()) {
+            cmbIssueType.addItem(type.getValue());
+        }
+        
+        cmbPriority.removeAllItems();
+        for (Priority priority : Priority.values()) {
+            cmbPriority.addItem(priority.getValue());
+        }
+        cmbPriority.setSelectedItem("Medium");
+}
+
+//    public ReportIssueJPanel() {
+//        initComponents();
+//    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -26,28 +65,233 @@ public class ReportIssueJPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        cmbIssueType = new javax.swing.JComboBox<>();
+        jLabel4 = new javax.swing.JLabel();
+        cmbPriority = new javax.swing.JComboBox<>();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        txtStreet = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        txtZipCode = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        txtLandmark = new javax.swing.JTextField();
+        btnSubmit = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtDescription = new javax.swing.JTextArea();
+
+        setAlignmentX(180.0F);
+        setAlignmentY(180.0F);
+        setPreferredSize(new java.awt.Dimension(400, 100));
+        setLayout(null);
+
+        jLabel1.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jLabel1.setText("Report New Issue");
+        add(jLabel1);
+        jLabel1.setBounds(250, 30, 210, 22);
+
+        jLabel3.setText("Issue Type:");
+        add(jLabel3);
+        jLabel3.setBounds(50, 90, 80, 16);
+
+        add(cmbIssueType);
+        cmbIssueType.setBounds(150, 90, 72, 22);
+
+        jLabel4.setText("Priority:");
+        add(jLabel4);
+        jLabel4.setBounds(50, 140, 60, 16);
+
+        add(cmbPriority);
+        cmbPriority.setBounds(150, 130, 72, 22);
+
+        jLabel2.setText("Description");
+        add(jLabel2);
+        jLabel2.setBounds(40, 170, 80, 16);
+
+        jLabel5.setText("Street Address:");
+        add(jLabel5);
+        jLabel5.setBounds(37, 280, 90, 16);
+        add(txtStreet);
+        txtStreet.setBounds(150, 270, 140, 22);
+
+        jLabel6.setText("Zip Code:");
+        add(jLabel6);
+        jLabel6.setBounds(40, 320, 60, 16);
+        add(txtZipCode);
+        txtZipCode.setBounds(150, 320, 140, 22);
+
+        jLabel7.setText("Landmark:");
+        add(jLabel7);
+        jLabel7.setBounds(27, 360, 60, 16);
+        add(txtLandmark);
+        txtLandmark.setBounds(150, 360, 140, 22);
+
+        btnSubmit.setText("Submit Request");
+        btnSubmit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSubmitActionPerformed(evt);
+            }
+        });
+        add(btnSubmit);
+        btnSubmit.setBounds(133, 410, 140, 23);
+
+        btnCancel.setText("Cancel");
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
+        add(btnCancel);
+        btnCancel.setBounds(300, 410, 100, 23);
+
+        txtDescription.setColumns(20);
+        txtDescription.setRows(5);
+        jScrollPane2.setViewportView(txtDescription);
+
+        jScrollPane3.setViewportView(jScrollPane2);
+
+        add(jScrollPane3);
+        jScrollPane3.setBounds(140, 170, 190, 80);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmitActionPerformed
+         if (cmbIssueType.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Please select an issue type!", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        if (txtDescription.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a description!", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        if (txtStreet.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter street address!", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        if (txtZipCode.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter zip code!", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        if (!business.validation.ValidationHelper.isValidZipCode(txtZipCode.getText().trim())) {
+            JOptionPane.showMessageDialog(this, "Invalid zip code format! Use: 12345 or 12345-6789", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        try {
+            WorkRequest request = new WorkRequest();
+            
+            String selectedIssueType = (String) cmbIssueType.getSelectedItem();
+            for (IssueType type : IssueType.values()) {
+                if (type.getValue().equals(selectedIssueType)) {
+                    request.setIssueType(type);
+                    break;
+                }
+            }
+            
+            String selectedPriority = (String) cmbPriority.getSelectedItem();
+            for (Priority priority : Priority.values()) {
+                if (priority.getValue().equals(selectedPriority)) {
+                    request.setPriority(priority);
+                    break;
+                }
+            }
+            
+            request.setDescription(txtDescription.getText().trim());
+            request.setSender(userAccount);
+            
+            Location location = new Location();
+            location.setStreet(txtStreet.getText().trim());
+            location.setZipCode(txtZipCode.getText().trim());
+            location.setLandmark(txtLandmark.getText().trim());
+            request.setLocation(location);
+            
+            if (userAccount != null && userAccount.getPerson() != null) {
+                request.setCitizenId(userAccount.getPerson().getPersonId());
+            }
+            
+            model.network.Network network = ecoSystem.getNetworks().get(0);
+            model.enterprise.Enterprise enterprise = business.routing.WorkRequestRouter.routeToEnterprise(request, network);
+            
+            if (enterprise != null) {
+                model.organization.Organization org = business.routing.WorkRequestRouter.routeToOrganization(request, enterprise);
+                
+                if (org != null) {
+                    org.getWorkQueue().addWorkRequest(request);
+                    
+                    JOptionPane.showMessageDialog(this, 
+                        "Request submitted successfully!\nRequest ID: " + request.getRequestId() + 
+                        "\nRouted to: " + org.getName(),
+                        "Success", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                    
+                    clearForm();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Unable to route request. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Unable to find appropriate department.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error creating request: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnSubmitActionPerformed
+
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+clearForm();
+    
+    try {
+        workArea.remove(this);
+        CardLayout layout = (CardLayout) workArea.getLayout();
+        layout.first(workArea); // Show first card (Welcome)
+        workArea.revalidate();
+        workArea.repaint();
+    } catch (Exception e) {
+        // Fallback
+        workArea.remove(this);
+        workArea.revalidate();
+        workArea.repaint();
+    }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCancelActionPerformed
+private void clearForm() {
+   cmbIssueType.setSelectedIndex(0);
+        cmbPriority.setSelectedItem("Medium");
+        txtDescription.setText("");
+        txtStreet.setText("");
+        txtZipCode.setText("");
+        txtLandmark.setText("");
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnSubmit;
+    private javax.swing.JComboBox<String> cmbIssueType;
+    private javax.swing.JComboBox<String> cmbPriority;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextArea txtDescription;
+    private javax.swing.JTextField txtLandmark;
+    private javax.swing.JTextField txtStreet;
+    private javax.swing.JTextField txtZipCode;
     // End of variables declaration//GEN-END:variables
-private javax.swing.JPanel userProcessContainer;
-    private model.ecosystem.EcoSystem ecoSystem;
 
-    public ReportIssueJPanel(javax.swing.JPanel userProcessContainer, model.ecosystem.EcoSystem ecoSystem) {
-        this.userProcessContainer = userProcessContainer;
-        this.ecoSystem = ecoSystem;
-        initComponents();
-    }
+
+    
 
 }
