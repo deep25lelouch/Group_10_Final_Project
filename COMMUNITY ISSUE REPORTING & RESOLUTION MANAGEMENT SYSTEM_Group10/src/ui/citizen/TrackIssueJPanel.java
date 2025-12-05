@@ -34,7 +34,7 @@ public class TrackIssueJPanel extends javax.swing.JPanel {
                            model.ecosystem.EcoSystem ecoSystem, 
                            model.userAccount.UserAccount account) {
         
-        this.workArea = workArea;  // ← Changed
+        this.workArea = workArea;  
     this.ecoSystem = ecoSystem;
     this.userAccount = account;
         initComponents();
