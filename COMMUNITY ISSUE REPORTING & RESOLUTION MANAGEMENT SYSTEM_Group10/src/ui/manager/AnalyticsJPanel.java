@@ -4,18 +4,89 @@
  */
 package ui.manager;
 
+import java.awt.CardLayout;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author RIO
  */
 public class AnalyticsJPanel extends javax.swing.JPanel {
-
+private javax.swing.JPanel userProcessContainer;
+private model.ecosystem.EcoSystem ecoSystem;
+private model.enterprise.Enterprise enterprise;
     /**
      * Creates new form AnalyticsJPanel
      */
-    public AnalyticsJPanel() {
+    public AnalyticsJPanel(javax.swing.JPanel userProcessContainer, 
+                      model.ecosystem.EcoSystem ecoSystem, 
+                      model.enterprise.Enterprise enterprise) {
+         this.userProcessContainer = userProcessContainer;
+    this.ecoSystem = ecoSystem;
+    this.enterprise = enterprise;
         initComponents();
+        populateAnalytics();
     }
+private void populateAnalytics() {
+     try {
+        // Fallback: if enterprise is null, pick the first one from ecosystem
+        if (enterprise == null) {
+            if (ecoSystem == null || ecoSystem.getNetworks().isEmpty()
+                    || ecoSystem.getNetworks().get(0).getEnterprises().isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "No enterprise found for analytics!",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            enterprise = ecoSystem.getNetworks().get(0).getEnterprises().get(0);
+        }
+
+        // Build analytics object for this enterprise
+        model.analytics.Analytics analytics = new model.analytics.Analytics(enterprise);
+
+        int totalRequests = analytics.getTotalRequests();
+        double completionRate = analytics.getCompletionRate();
+        double avgResolutionTime = analytics.getAverageResolutionTime();
+
+        java.util.Map<util.enums.Status, Integer> statusMap = analytics.getRequestsByStatus();
+
+        // Fill the status breakdown table
+        DefaultTableModel model = (DefaultTableModel) tblStatusBreakdown.getModel();
+        model.setRowCount(0);
+
+        for (util.enums.Status status : statusMap.keySet()) {
+            model.addRow(new Object[]{
+                status.getValue(),
+                statusMap.get(status)
+            });
+        }
+
+        // Build summary text
+        StringBuilder summary = new StringBuilder();
+        summary.append("Enterprise: ").append(enterprise.getName()).append("\n");
+        summary.append("=====================================\n");
+        summary.append("Total Requests: ").append(totalRequests).append("\n");
+        summary.append("Completion Rate: ").append(String.format("%.2f %%", completionRate)).append("\n");
+        summary.append("Average Resolution Time: ").append(String.format("%.2f hours", avgResolutionTime)).append("\n\n");
+
+        summary.append("By Status:\n");
+        for (util.enums.Status status : statusMap.keySet()) {
+            summary.append("  ").append(status.getValue())
+                   .append(": ").append(statusMap.get(status)).append("\n");
+        }
+
+        txtSummary.setText(summary.toString());
+        txtSummary.setCaretPosition(0);
+
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+                "Error while loading analytics: " + e.getMessage(),
+                "Error",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -26,30 +97,180 @@ public class AnalyticsJPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lblTitle = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblStatusBreakdown = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtSummary = new javax.swing.JTextArea();
+        btnRefresh = new javax.swing.JButton();
+        btnGenerateReport = new javax.swing.JButton();
+        btnBack = new javax.swing.JButton();
+
+        lblTitle.setText("Enterprise Analytics - Detailed View");
+
+        tblStatusBreakdown.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
+            },
+            new String [] {
+                "Status", "Count"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tblStatusBreakdown);
+
+        txtSummary.setEditable(false);
+        txtSummary.setColumns(20);
+        txtSummary.setLineWrap(true);
+        txtSummary.setRows(5);
+        txtSummary.setWrapStyleWord(true);
+        jScrollPane2.setViewportView(txtSummary);
+
+        btnRefresh.setText("Refresh");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
+        btnGenerateReport.setText("Generate Report");
+        btnGenerateReport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGenerateReportActionPerformed(evt);
+            }
+        });
+
+        btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(185, Short.MAX_VALUE)
+                .addComponent(lblTitle)
+                .addGap(199, 199, 199))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(39, 39, 39)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(btnRefresh)
+                            .addGap(44, 44, 44)
+                            .addComponent(btnGenerateReport)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnBack))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblTitle)
+                .addGap(32, 32, 32)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(68, 68, 68)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(37, 37, 37)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRefresh)
+                    .addComponent(btnGenerateReport)
+                    .addComponent(btnBack))
+                .addContainerGap(79, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+populateAnalytics();
+    javax.swing.JOptionPane.showMessageDialog(this,
+            "Analytics refreshed!",
+            "Success",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);       
+        
+// TODO add your handling code here:
+    }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnGenerateReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerateReportActionPerformed
+
+
+ try {
+        if (enterprise == null) {
+            if (ecoSystem == null || ecoSystem.getNetworks().isEmpty()
+                    || ecoSystem.getNetworks().get(0).getEnterprises().isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this,
+                        "No enterprise found for analytics!",
+                        "Error",
+                        javax.swing.JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            enterprise = ecoSystem.getNetworks().get(0).getEnterprises().get(0);
+        }
+
+        model.analytics.Analytics analytics = new model.analytics.Analytics(enterprise);
+        model.analytics.AnalyticsReport report = new model.analytics.AnalyticsReport(
+                analytics,
+                "Enterprise Analytics - " + enterprise.getName()
+        );
+
+        String reportText = report.getSummary();
+
+        javax.swing.JTextArea textArea = new javax.swing.JTextArea(reportText);
+        textArea.setEditable(false);
+        textArea.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 12));
+
+        javax.swing.JScrollPane scrollPane = new javax.swing.JScrollPane(textArea);
+        scrollPane.setPreferredSize(new java.awt.Dimension(600, 400));
+
+        javax.swing.JOptionPane.showMessageDialog(this,
+                scrollPane,
+                "Analytics Summary Report",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this,
+                "Error generating report: " + e.getMessage(),
+                "Error",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }        // TODO add your handling code here:
+    }//GEN-LAST:event_btnGenerateReportActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+ if (userProcessContainer != null) {
+        CardLayout layout = (CardLayout) userProcessContainer.getLayout();
+        userProcessContainer.remove(this);
+        layout.previous(userProcessContainer);
+    }        // TODO add your handling code here:
+    }//GEN-LAST:event_btnBackActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnGenerateReport;
+    private javax.swing.JButton btnRefresh;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblTitle;
+    private javax.swing.JTable tblStatusBreakdown;
+    private javax.swing.JTextArea txtSummary;
     // End of variables declaration//GEN-END:variables
-private javax.swing.JPanel userProcessContainer;
-    private model.ecosystem.EcoSystem ecoSystem;
-    private model.enterprise.Enterprise enterprise;
 
-    public AnalyticsJPanel(javax.swing.JPanel userProcessContainer, model.ecosystem.EcoSystem ecoSystem, model.enterprise.Enterprise enterprise) {
-        this.userProcessContainer = userProcessContainer;
-        this.ecoSystem = ecoSystem;
-        this.enterprise = enterprise;
-        initComponents();
-    }
 
 }
