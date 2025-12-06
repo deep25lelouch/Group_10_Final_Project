@@ -3,20 +3,98 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package ui.worker;
-
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import model.ecosystem.EcoSystem;
+import model.userAccount.UserAccount;
+import model.workQueue.WorkRequest;
+import util.enums.Status;
 /**
  *
  * @author RIO
  */
 public class WorkerDashboardJPanel extends javax.swing.JPanel {
-
+   
+private javax.swing.table.DefaultTableModel tableModel;
     /**
      * Creates new form WorkerDashboardJPanel
      */
-    public WorkerDashboardJPanel() {
+    public WorkerDashboardJPanel(javax.swing.JPanel userProcessContainer, 
+                             model.ecosystem.EcoSystem ecoSystem, 
+                             model.userAccount.UserAccount account) {
+        
+         this.userProcessContainer = userProcessContainer;
+    this.ecoSystem = ecoSystem;
+    this.userAccount = account;
         initComponents();
+        
+         setupTable();
+    customizeUI();
+    loadWorkRequests();
     }
+private void setupTable() {
+    tableModel = (javax.swing.table.DefaultTableModel) tblWorkRequests.getModel();
+    tblWorkRequests.setRowHeight(25);
+    tblWorkRequests.getTableHeader().setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
+}
 
+private void customizeUI() {
+    if (userAccount != null && userAccount.getPerson() != null) {
+        lblWelcome.setText("Welcome, " + userAccount.getPerson().getFullName() + 
+                          " (" + userAccount.getRole().toString() + ")");
+    }
+}
+
+private void loadWorkRequests() {
+    tableModel.setRowCount(0);
+    
+    if (userAccount == null) {
+        return;
+    }
+    
+    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy");
+    int pendingCount = 0;
+    int completedCount = 0;
+    
+    try {
+        for (model.workQueue.WorkRequest request : userAccount.getWorkQueue().getWorkRequests()) {
+            Object[] row = {
+                request.getRequestId(),
+                request.getIssueType() != null ? request.getIssueType().getValue() : "N/A",
+                request.getPriority() != null ? request.getPriority().getValue() : "N/A",
+                request.getStatus() != null ? request.getStatus().getValue() : "N/A",
+                request.getLocation() != null ? request.getLocation().getStreet() : "N/A",
+                request.getRequestDate() != null ? dateFormat.format(request.getRequestDate()) : "N/A"
+            };
+            tableModel.addRow(row);
+            
+            if (request.getStatus() == util.enums.Status.COMPLETED) {
+                completedCount++;
+            } else {
+                pendingCount++;
+            }
+        }
+        
+        lblPendingTasks.setText("Pending: " + pendingCount);
+        lblCompletedTasks.setText("Completed: " + completedCount);
+        
+        if (userAccount.getWorkQueue().getWorkRequests().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "No work requests assigned yet.", 
+                "No Tasks", 
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
+        
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Error loading work requests: " + e.getMessage(), 
+            "Error", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -26,30 +104,290 @@ public class WorkerDashboardJPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        topPanel = new javax.swing.JPanel();
+        lblWelcome = new javax.swing.JLabel();
+        lblPendingTasks = new javax.swing.JLabel();
+        lblCompletedTasks = new javax.swing.JLabel();
+        scrollPane = new javax.swing.JScrollPane();
+        tblWorkRequests = new javax.swing.JTable();
+        bottomPanel = new javax.swing.JPanel();
+        btnUpdateStatus = new javax.swing.JButton();
+        btnRefresh = new javax.swing.JButton();
+        btnViewDetails = new javax.swing.JButton();
+        btnLogout = new javax.swing.JButton();
+
+        setBackground(new java.awt.Color(204, 255, 255));
+        setPreferredSize(new java.awt.Dimension(700, 700));
+        setLayout(new java.awt.BorderLayout());
+
+        lblWelcome.setText("Worker Dashboard");
+
+        lblPendingTasks.setText("Pending:0");
+
+        lblCompletedTasks.setText("Completed:0");
+
+        javax.swing.GroupLayout topPanelLayout = new javax.swing.GroupLayout(topPanel);
+        topPanel.setLayout(topPanelLayout);
+        topPanelLayout.setHorizontalGroup(
+            topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(topPanelLayout.createSequentialGroup()
+                .addGap(51, 51, 51)
+                .addComponent(lblWelcome)
+                .addGap(133, 133, 133)
+                .addComponent(lblPendingTasks)
+                .addGap(137, 137, 137)
+                .addComponent(lblCompletedTasks)
+                .addContainerGap(468, Short.MAX_VALUE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        topPanelLayout.setVerticalGroup(
+            topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(topPanelLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblWelcome)
+                    .addComponent(lblPendingTasks)
+                    .addComponent(lblCompletedTasks))
+                .addContainerGap(64, Short.MAX_VALUE))
         );
+
+        add(topPanel, java.awt.BorderLayout.PAGE_START);
+
+        tblWorkRequests.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Request ID", "Issue Type", "Priority", "Status", "Location", "Date"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, true, true
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        scrollPane.setViewportView(tblWorkRequests);
+
+        add(scrollPane, java.awt.BorderLayout.CENTER);
+
+        btnUpdateStatus.setText("Update Status");
+        btnUpdateStatus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateStatusActionPerformed(evt);
+            }
+        });
+
+        btnRefresh.setText("Refresh");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
+        btnViewDetails.setText("View Details");
+        btnViewDetails.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewDetailsActionPerformed(evt);
+            }
+        });
+
+        btnLogout.setText("Log Out");
+        btnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogoutActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout bottomPanelLayout = new javax.swing.GroupLayout(bottomPanel);
+        bottomPanel.setLayout(bottomPanelLayout);
+        bottomPanelLayout.setHorizontalGroup(
+            bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bottomPanelLayout.createSequentialGroup()
+                .addGap(83, 83, 83)
+                .addComponent(btnViewDetails)
+                .addGap(55, 55, 55)
+                .addComponent(btnUpdateStatus)
+                .addGap(50, 50, 50)
+                .addComponent(btnRefresh)
+                .addGap(29, 29, 29)
+                .addComponent(btnLogout)
+                .addContainerGap(451, Short.MAX_VALUE))
+        );
+        bottomPanelLayout.setVerticalGroup(
+            bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bottomPanelLayout.createSequentialGroup()
+                .addGap(36, 36, 36)
+                .addGroup(bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnUpdateStatus)
+                    .addComponent(btnRefresh)
+                    .addComponent(btnViewDetails)
+                    .addComponent(btnLogout))
+                .addContainerGap(41, Short.MAX_VALUE))
+        );
+
+        add(bottomPanel, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnViewDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewDetailsActionPerformed
+        javax.swing.JOptionPane.showMessageDialog(this, 
+        "View Details - Coming soon!", 
+        "Info", 
+        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnViewDetailsActionPerformed
+
+    private void btnUpdateStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateStatusActionPerformed
+
+        int selectedRow = tblWorkRequests.getSelectedRow();
+    
+    if (selectedRow == -1) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Please select a work request!", 
+            "No Selection", 
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    try {
+        String requestId = (String) tableModel.getValueAt(selectedRow, 0);
+        
+        model.workQueue.WorkRequest selectedRequest = null;
+        for (model.workQueue.WorkRequest request : userAccount.getWorkQueue().getWorkRequests()) {
+            if (request.getRequestId().equals(requestId)) {
+                selectedRequest = request;
+                break;
+            }
+        }
+        
+        if (selectedRequest == null) return;
+        
+        String[] statusOptions = {"Assigned", "In Progress", "Completed"};
+        String currentStatus = selectedRequest.getStatus() != null ? 
+                              selectedRequest.getStatus().getValue() : "New";
+        
+        String newStatusStr = (String) javax.swing.JOptionPane.showInputDialog(
+            this,
+            "Current: " + currentStatus + "\nSelect new status:",
+            "Update Status",
+            javax.swing.JOptionPane.QUESTION_MESSAGE,
+            null,
+            statusOptions,
+            statusOptions[1]
+        );
+        
+        if (newStatusStr != null) {
+            util.enums.Status newStatus = null;
+            switch (newStatusStr) {
+                case "Assigned":
+                    newStatus = util.enums.Status.ASSIGNED;
+                    break;
+                case "In Progress":
+                    newStatus = util.enums.Status.IN_PROGRESS;
+                    break;
+                case "Completed":
+                    newStatus = util.enums.Status.COMPLETED;
+                    selectedRequest.setResolveDate(new java.util.Date());
+                    break;
+            }
+            
+            selectedRequest.setStatus(newStatus);
+            
+            String note = javax.swing.JOptionPane.showInputDialog(this, 
+                "Add note (optional):",
+                "Add Note",
+                javax.swing.JOptionPane.QUESTION_MESSAGE);
+            
+            if (note != null && !note.trim().isEmpty()) {
+                selectedRequest.addNote(note, userAccount);
+            }
+            
+            if (newStatus == util.enums.Status.COMPLETED && selectedRequest.getSender() != null) {
+                business.notification.NotificationService.notifyCompletion(
+                    selectedRequest.getSender(), selectedRequest);
+            }
+            
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Status updated to: " + newStatusStr, 
+                "Success", 
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            
+            loadWorkRequests();
+        }
+        
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Error: " + e.getMessage(), 
+            "Error", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnUpdateStatusActionPerformed
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+   loadWorkRequests();
+    javax.swing.JOptionPane.showMessageDialog(this, 
+        "Refreshed!", 
+        "Success", 
+        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+         int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
+        "Are you sure you want to logout?",
+        "Confirm Logout",
+        javax.swing.JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+        // Go back to login screen
+        userProcessContainer.removeAll();
+        
+        ui.login.LoginJPanel loginPanel = new ui.login.LoginJPanel(userProcessContainer, ecoSystem);
+        userProcessContainer.add(loginPanel, "Login");
+        
+        java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+        layout.show(userProcessContainer, "Login");
+        
+        userProcessContainer.revalidate();
+        userProcessContainer.repaint();
+    }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLogoutActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel bottomPanel;
+    private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnRefresh;
+    private javax.swing.JButton btnUpdateStatus;
+    private javax.swing.JButton btnViewDetails;
+    private javax.swing.JLabel lblCompletedTasks;
+    private javax.swing.JLabel lblPendingTasks;
+    private javax.swing.JLabel lblWelcome;
+    private javax.swing.JScrollPane scrollPane;
+    private javax.swing.JTable tblWorkRequests;
+    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 private javax.swing.JPanel userProcessContainer;
     private model.ecosystem.EcoSystem ecoSystem;
     private model.userAccount.UserAccount userAccount;
 
-    public WorkerDashboardJPanel(javax.swing.JPanel userProcessContainer, model.ecosystem.EcoSystem ecoSystem, model.userAccount.UserAccount account) {
-        this.userProcessContainer = userProcessContainer;
-        this.ecoSystem = ecoSystem;
-        this.userAccount = account;
-        initComponents();
-    }
+  
 
 }
