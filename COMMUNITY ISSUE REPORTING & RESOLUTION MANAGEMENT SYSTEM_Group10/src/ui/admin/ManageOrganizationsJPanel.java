@@ -35,9 +35,9 @@ public class ManageOrganizationsJPanel extends javax.swing.JPanel {
     loadOrganizations();
 }
    private void setupTable() {
-    tableModel = (DefaultTableModel) tblOrganizations.getModel();  // ← Use table name
+    tableModel = (DefaultTableModel) tblOrganizations.getModel();  
     tblOrganizations.setRowHeight(25);  // ← Use table name
-    tblOrganizations.getTableHeader().setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));  // ← Use table name
+    tblOrganizations.getTableHeader().setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));  
 }
 
 private void loadEnterprises() {
