@@ -47,6 +47,7 @@ public class AdminDashboardJPanel extends javax.swing.JPanel {
         btnManageOrganization = new javax.swing.JButton();
         btnManageUsers = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        btnLogout = new javax.swing.JButton();
         workArea = new javax.swing.JPanel();
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.LINE_AXIS));
@@ -82,6 +83,13 @@ public class AdminDashboardJPanel extends javax.swing.JPanel {
         jLabel1.setFont(new java.awt.Font("Arial Black", 1, 13)); // NOI18N
         jLabel1.setText("Admin Dashboard");
 
+        btnLogout.setText("Log Out");
+        btnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogoutActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout sidebarPanelLayout = new javax.swing.GroupLayout(sidebarPanel);
         sidebarPanel.setLayout(sidebarPanelLayout);
         sidebarPanelLayout.setHorizontalGroup(
@@ -90,14 +98,17 @@ public class AdminDashboardJPanel extends javax.swing.JPanel {
                 .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(sidebarPanelLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(btnManageNetworks)
-                            .addComponent(btnManageEnterprise)
-                            .addComponent(btnManageOrganization)
-                            .addComponent(btnManageUsers)))
+                            .addComponent(btnManageOrganization, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnManageUsers, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnManageEnterprise, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(sidebarPanelLayout.createSequentialGroup()
                         .addGap(17, 17, 17)
-                        .addComponent(jLabel1)))
+                        .addComponent(jLabel1))
+                    .addGroup(sidebarPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btnLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         sidebarPanelLayout.setVerticalGroup(
@@ -113,7 +124,9 @@ public class AdminDashboardJPanel extends javax.swing.JPanel {
                 .addComponent(btnManageOrganization)
                 .addGap(60, 60, 60)
                 .addComponent(btnManageUsers)
-                .addContainerGap(183, Short.MAX_VALUE))
+                .addGap(31, 31, 31)
+                .addComponent(btnLogout)
+                .addContainerGap(129, Short.MAX_VALUE))
         );
 
         splitPane.setLeftComponent(sidebarPanel);
@@ -156,8 +169,30 @@ public class AdminDashboardJPanel extends javax.swing.JPanel {
 
     }//GEN-LAST:event_btnManageUsersActionPerformed
 
+    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
+        "Are you sure you want to logout?",
+        "Confirm Logout",
+        javax.swing.JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+        // Go back to login screen
+        userProcessContainer.removeAll();
+        
+        ui.login.LoginJPanel loginPanel = new ui.login.LoginJPanel(userProcessContainer, ecoSystem);
+        userProcessContainer.add(loginPanel, "Login");
+        
+        java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+        layout.show(userProcessContainer, "Login");
+        
+        userProcessContainer.revalidate();
+        userProcessContainer.repaint();
+    }        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLogoutActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnManageEnterprise;
     private javax.swing.JButton btnManageNetworks;
     private javax.swing.JButton btnManageOrganization;
