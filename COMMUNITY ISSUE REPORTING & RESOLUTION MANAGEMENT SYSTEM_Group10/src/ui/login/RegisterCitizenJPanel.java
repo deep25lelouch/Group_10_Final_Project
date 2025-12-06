@@ -4,19 +4,45 @@
  */
 package ui.login;
 
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author RIO
  */
 public class RegisterCitizenJPanel extends javax.swing.JPanel {
-
+  
     /**
      * Creates new form RegisterCitizenJPanel
      */
-    public RegisterCitizenJPanel() {
+    public RegisterCitizenJPanel(javax.swing.JPanel userProcessContainer, 
+                             model.ecosystem.EcoSystem ecoSystem) {
+        
+          this.userProcessContainer = userProcessContainer;
+    this.ecoSystem = ecoSystem;
         initComponents();
+         setupPasswordListener();
     }
-
+private void setupPasswordListener() {
+    // Add listener to password field to show strength
+    txtPassword.addKeyListener(new java.awt.event.KeyAdapter() {
+        public void keyReleased(java.awt.event.KeyEvent evt) {
+            String password = new String(txtPassword.getPassword());
+            String strength = business.validation.ValidationHelper.getPasswordStrength(password);
+            
+            lblPasswordStrength.setText("Password Strength: " + strength);
+            
+            // Color code the strength
+            if ("Strong".equals(strength)) {
+                lblPasswordStrength.setForeground(new java.awt.Color(0, 128, 0)); // Green
+            } else if ("Medium".equals(strength)) {
+                lblPasswordStrength.setForeground(new java.awt.Color(255, 140, 0)); // Orange
+            } else {
+                lblPasswordStrength.setForeground(java.awt.Color.RED);
+            }
+        }
+    });
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -26,28 +52,351 @@ public class RegisterCitizenJPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        btnRegister = new javax.swing.JButton();
+        btnBackToLogin = new javax.swing.JButton();
+        txtFirstName = new javax.swing.JTextField();
+        txtLastName = new javax.swing.JTextField();
+        txtEmail = new javax.swing.JTextField();
+        txtPhone = new javax.swing.JTextField();
+        txtAddress = new javax.swing.JTextField();
+        txtUsername = new javax.swing.JTextField();
+        txtPassword = new javax.swing.JPasswordField();
+        txtConfirmPassword = new javax.swing.JPasswordField();
+        lblPasswordStrength = new javax.swing.JLabel();
+
+        jLabel1.setText("Citizen Registration");
+
+        jLabel2.setText("First Name:");
+
+        jLabel3.setText("Last Name:");
+
+        jLabel4.setText("Email:");
+
+        jLabel5.setText("Phone:");
+
+        jLabel6.setText("Address:");
+
+        jLabel7.setText("Username:");
+
+        jLabel8.setText("Password:");
+
+        jLabel9.setText("Confirm Password:");
+
+        btnRegister.setText("Register");
+        btnRegister.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegisterActionPerformed(evt);
+            }
+        });
+
+        btnBackToLogin.setText("Back to Login");
+        btnBackToLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackToLoginActionPerformed(evt);
+            }
+        });
+
+        lblPasswordStrength.setText("Password Strength");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel9))
+                        .addGap(17, 17, 17)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtConfirmPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(txtPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+                                .addComponent(txtUsername)
+                                .addComponent(txtAddress)
+                                .addComponent(txtFirstName)
+                                .addComponent(txtLastName)
+                                .addComponent(txtEmail)
+                                .addComponent(txtPhone))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(98, 98, 98)
+                        .addComponent(btnRegister)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnBackToLogin))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(178, 178, 178)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(159, 159, 159)
+                        .addComponent(lblPasswordStrength)))
+                .addContainerGap(158, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtLastName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(txtAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(6, 6, 6)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(txtConfirmPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addComponent(lblPasswordStrength)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRegister)
+                    .addComponent(btnBackToLogin))
+                .addGap(19, 19, 19))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
+ String firstName = txtFirstName.getText().trim();
+    String lastName = txtLastName.getText().trim();
+    String email = txtEmail.getText().trim();
+    String phone = txtPhone.getText().trim();
+    String address = txtAddress.getText().trim();
+    String username = txtUsername.getText().trim();
+    String password = new String(txtPassword.getPassword());
+    String confirmPassword = new String(txtConfirmPassword.getPassword());
+    
+    // Validate First Name
+    if (!business.validation.ValidationHelper.isValidName(firstName)) {
+        JOptionPane.showMessageDialog(this, 
+            "Please enter a valid first name (minimum 2 characters, letters only)!", 
+            "Validation Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    // Validate Last Name
+    if (!business.validation.ValidationHelper.isValidName(lastName)) {
+        JOptionPane.showMessageDialog(this, 
+            "Please enter a valid last name (minimum 2 characters, letters only)!", 
+            "Validation Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    // Validate Email
+    if (!business.validation.ValidationHelper.isValidEmail(email)) {
+        JOptionPane.showMessageDialog(this, 
+            "Please enter a valid email address!", 
+            "Validation Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    // Validate Phone
+    if (!business.validation.ValidationHelper.isValidPhone(phone)) {
+        JOptionPane.showMessageDialog(this, 
+            "Please enter a valid phone number (format: 123-456-7890)!", 
+            "Validation Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    // Validate Address
+    if (address.isEmpty()) {
+        JOptionPane.showMessageDialog(this, 
+            "Please enter your address!", 
+            "Validation Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    // Validate Username
+    if (username.isEmpty() || username.length() < 4) {
+        JOptionPane.showMessageDialog(this, 
+            "Username must be at least 4 characters!", 
+            "Validation Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    // Validate Password
+    if (!business.validation.ValidationHelper.isValidPassword(password)) {
+        JOptionPane.showMessageDialog(this, 
+            "Password must be at least 8 characters and contain:\n" +
+            "- One uppercase letter\n" +
+            "- One lowercase letter\n" +
+            "- One digit\n" +
+            "- One special character (@#$%^&+=!)", 
+            "Validation Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    // Check passwords match
+    if (!password.equals(confirmPassword)) {
+        JOptionPane.showMessageDialog(this, 
+            "Passwords do not match!", 
+            "Validation Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    // Check if username already exists
+    if (isUsernameExists(username)) {
+        JOptionPane.showMessageDialog(this, 
+            "Username already exists! Please choose a different username.", 
+            "Validation Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    try {
+        // Create Person
+        model.organization.Organization org = ecoSystem.getNetworks().get(0)
+                                              .getEnterprises().get(0)
+                                              .getOrganizations().get(0);
+        
+        model.person.Person person = org.getPersonDirectory()
+                                        .createAndAddPerson(firstName, lastName, email, phone);
+        person.setAddress(address);
+        
+        // Create UserAccount with CitizenRole
+        model.userAccount.UserAccount userAccount = new model.userAccount.UserAccount();
+        userAccount.setUsername(username);
+        userAccount.setPassword(password);
+        userAccount.setPerson(person);
+        userAccount.setRole(new model.role.CitizenRole());
+        
+        // Add to organization
+        org.getUserAccounts().add(userAccount);
+        
+        // Show success message
+        JOptionPane.showMessageDialog(this, 
+            "Registration successful!\n" +
+            "Username: " + username + "\n" +
+            "You can now login with your credentials.", 
+            "Success", 
+            JOptionPane.INFORMATION_MESSAGE);
+        
+        // Clear form
+        clearForm();
+        
+        // Navigate back to login
+        goBackToLogin();
+        
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, 
+            "Error during registration: " + e.getMessage(), 
+            "Error", 
+            JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegisterActionPerformed
+
+    private void btnBackToLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackToLoginActionPerformed
+goBackToLogin();
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnBackToLoginActionPerformed
+private boolean isUsernameExists(String username) {
+    for (model.network.Network network : ecoSystem.getNetworks()) {
+        for (model.enterprise.Enterprise enterprise : network.getEnterprises()) {
+            for (model.organization.Organization org : enterprise.getOrganizations()) {
+                for (model.userAccount.UserAccount account : org.getUserAccounts()) {
+                    if (account.getUsername().equalsIgnoreCase(username)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+private void clearForm() {
+    txtFirstName.setText("");
+    txtLastName.setText("");
+    txtEmail.setText("");
+    txtPhone.setText("");
+    txtAddress.setText("");
+    txtUsername.setText("");
+    txtPassword.setText("");
+    txtConfirmPassword.setText("");
+    lblPasswordStrength.setText("Password Strength: ");
+}
+
+private void goBackToLogin() {
+    userProcessContainer.remove(this);
+    java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+    layout.previous(userProcessContainer);
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBackToLogin;
+    private javax.swing.JButton btnRegister;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel lblPasswordStrength;
+    private javax.swing.JTextField txtAddress;
+    private javax.swing.JPasswordField txtConfirmPassword;
+    private javax.swing.JTextField txtEmail;
+    private javax.swing.JTextField txtFirstName;
+    private javax.swing.JTextField txtLastName;
+    private javax.swing.JPasswordField txtPassword;
+    private javax.swing.JTextField txtPhone;
+    private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 private javax.swing.JPanel userProcessContainer;
     private model.ecosystem.EcoSystem ecoSystem;
 
-    public RegisterCitizenJPanel(javax.swing.JPanel userProcessContainer, model.ecosystem.EcoSystem ecoSystem) {
-        this.userProcessContainer = userProcessContainer;
-        this.ecoSystem = ecoSystem;
-        initComponents();
-    }
-
+   
 }
