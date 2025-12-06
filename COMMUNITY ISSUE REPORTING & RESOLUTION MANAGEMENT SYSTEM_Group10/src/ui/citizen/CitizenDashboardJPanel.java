@@ -4,30 +4,52 @@
  */
 package ui.citizen;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import model.ecosystem.EcoSystem;
 import model.userAccount.UserAccount;
+import java.awt.*;
 
 /**
  *
  * @author RIO
  */
+
 public class CitizenDashboardJPanel extends javax.swing.JPanel {
 
     /**
      * Creates new form CitizenDashboardJPanel
      */
-    private JPanel userProcessContainer;
-private EcoSystem system;
-private UserAccount account;
-
+   
+private JPanel userProcessContainer;
+    private EcoSystem system;
+    private UserAccount account;
     
+  
+   
+
+   
    public CitizenDashboardJPanel(JPanel userProcessContainer, EcoSystem system, UserAccount account) {
-    this.userProcessContainer = userProcessContainer;
-    this.system = system;
-    this.account = account;
+this.userProcessContainer = userProcessContainer;
+        this.system = system;
+        this.account = account;
 
     initComponents();
+    customizeUI();
+    
+     javax.swing.JPanel welcomePanel = new javax.swing.JPanel(new java.awt.BorderLayout());
+    welcomePanel.add(lblMainWelcome, java.awt.BorderLayout.CENTER);
+    workArea.add(welcomePanel, "Welcome");
+    
+    CardLayout layout = (CardLayout) workArea.getLayout();
+    layout.show(workArea, "Welcome");
+}
+   
+   private void customizeUI() {
+    if (account != null && account.getPerson() != null) {
+            lblMainWelcome.setText("Welcome, " + account.getPerson().getFullName());
+            lblMainWelcome.setText("Welcome, " + account.getPerson().getFullName());
+        }
 }
 
 
@@ -40,20 +62,186 @@ private UserAccount account;
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        sidebarPanel = new javax.swing.JPanel();
+        btnReportIssue = new javax.swing.JButton();
+        btnTrackIssues = new javax.swing.JButton();
+        btnMyProfile = new javax.swing.JButton();
+        workArea = new javax.swing.JPanel();
+        lblMainWelcome = new javax.swing.JLabel();
+        btnLogout = new javax.swing.JButton();
+
+        setLayout(new java.awt.BorderLayout());
+
+        btnReportIssue.setText("Report New Issue");
+        btnReportIssue.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReportIssueActionPerformed(evt);
+            }
+        });
+
+        btnTrackIssues.setText("Track My Issues");
+        btnTrackIssues.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTrackIssuesActionPerformed(evt);
+            }
+        });
+
+        btnMyProfile.setText("My Profile");
+        btnMyProfile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMyProfileActionPerformed(evt);
+            }
+        });
+
+        workArea.setLayout(new java.awt.CardLayout());
+
+        lblMainWelcome.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        lblMainWelcome.setText("Welcome to Community Issue Reporting System");
+
+        btnLogout.setText("Logout");
+        btnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogoutActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout sidebarPanelLayout = new javax.swing.GroupLayout(sidebarPanel);
+        sidebarPanel.setLayout(sidebarPanelLayout);
+        sidebarPanelLayout.setHorizontalGroup(
+            sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sidebarPanelLayout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sidebarPanelLayout.createSequentialGroup()
+                        .addComponent(btnReportIssue)
+                        .addGap(0, 315, Short.MAX_VALUE))
+                    .addGroup(sidebarPanelLayout.createSequentialGroup()
+                        .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(btnMyProfile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnTrackIssues, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE))
+                        .addGap(49, 49, 49)
+                        .addComponent(btnLogout)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(165, 165, 165)
+                .addComponent(workArea, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(367, 367, 367))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sidebarPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblMainWelcome)
+                .addGap(65, 65, 65))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        sidebarPanelLayout.setVerticalGroup(
+            sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sidebarPanelLayout.createSequentialGroup()
+                .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(sidebarPanelLayout.createSequentialGroup()
+                        .addGap(94, 94, 94)
+                        .addComponent(btnReportIssue)
+                        .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(sidebarPanelLayout.createSequentialGroup()
+                                .addGap(31, 31, 31)
+                                .addComponent(btnTrackIssues)
+                                .addGap(35, 35, 35))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sidebarPanelLayout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnLogout)
+                                .addGap(20, 20, 20)))
+                        .addComponent(btnMyProfile))
+                    .addGroup(sidebarPanelLayout.createSequentialGroup()
+                        .addComponent(workArea, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblMainWelcome)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        add(sidebarPanel, java.awt.BorderLayout.PAGE_START);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnMyProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMyProfileActionPerformed
+       if (account != null && account.getPerson() != null) {
+            String info = "Name: " + account.getPerson().getFullName() + "\n" +
+                          "Email: " + account.getPerson().getEmail() + "\n" +
+                          "Phone: " + account.getPerson().getPhone() + "\n" +
+                          "Username: " + account.getUsername();
+
+            JOptionPane.showMessageDialog(this, info, "My Profile", JOptionPane.INFORMATION_MESSAGE);
+        }
+    
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnMyProfileActionPerformed
+
+    private void btnTrackIssuesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTrackIssuesActionPerformed
+        try {
+            ui.citizen.TrackIssueJPanel trackPanel = 
+                new ui.citizen.TrackIssueJPanel(workArea, system, account);
+            
+            workArea.add(trackPanel, "TrackIssues");
+            
+            CardLayout layout = (CardLayout) workArea.getLayout();
+            layout.show(workArea, "TrackIssues");
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error: " + e.getMessage(), 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnTrackIssuesActionPerformed
+
+    private void btnReportIssueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportIssueActionPerformed
+         try {
+            ui.citizen.ReportIssueJPanel reportPanel = 
+                new ui.citizen.ReportIssueJPanel(workArea, system, account);
+            
+            workArea.add(reportPanel, "ReportIssue");
+            
+            CardLayout layout = (CardLayout) workArea.getLayout();
+            layout.show(workArea, "ReportIssue");
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error: " + e.getMessage(), 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnReportIssueActionPerformed
+
+    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
+        "Are you sure you want to logout?",
+        "Confirm Logout",
+        javax.swing.JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+        userProcessContainer.removeAll();
+        
+        ui.login.LoginJPanel loginPanel = new ui.login.LoginJPanel(userProcessContainer, system);
+        userProcessContainer.add(loginPanel, "Login");
+        
+        java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+        layout.show(userProcessContainer, "Login");
+        
+        userProcessContainer.revalidate();
+        userProcessContainer.repaint();
+    }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLogoutActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnMyProfile;
+    private javax.swing.JButton btnReportIssue;
+    private javax.swing.JButton btnTrackIssues;
+    private javax.swing.JLabel lblMainWelcome;
+    private javax.swing.JPanel sidebarPanel;
+    private javax.swing.JPanel workArea;
     // End of variables declaration//GEN-END:variables
 
 

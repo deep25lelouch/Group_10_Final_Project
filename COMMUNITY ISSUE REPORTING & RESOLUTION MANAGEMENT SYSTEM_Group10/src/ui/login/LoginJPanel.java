@@ -37,6 +37,7 @@ public LoginJPanel(JPanel userProcessContainer, EcoSystem system) {
         btnLogin = new javax.swing.JButton();
         lblPassword = new javax.swing.JLabel();
         txtPassword = new javax.swing.JPasswordField();
+        btnRegister = new javax.swing.JButton();
 
         lblTitle.setFont(new java.awt.Font("Arial Black", 1, 18)); // NOI18N
         lblTitle.setText("Login Page");
@@ -60,6 +61,13 @@ public LoginJPanel(JPanel userProcessContainer, EcoSystem system) {
             }
         });
 
+        btnRegister.setText("Register");
+        btnRegister.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegisterActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -80,7 +88,9 @@ public LoginJPanel(JPanel userProcessContainer, EcoSystem system) {
                         .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(88, 88, 88)
-                        .addComponent(btnLogin)))
+                        .addComponent(btnLogin)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnRegister)))
                 .addContainerGap(249, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -97,7 +107,9 @@ public LoginJPanel(JPanel userProcessContainer, EcoSystem system) {
                     .addComponent(lblPassword)
                     .addComponent(txtPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(53, 53, 53)
-                .addComponent(btnLogin)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnLogin)
+                    .addComponent(btnRegister))
                 .addContainerGap(295, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -137,9 +149,22 @@ if (parent instanceof ui.main.MainJFrame) {
    
     }//GEN-LAST:event_txtPasswordActionPerformed
 
+    private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
+ui.login.RegisterCitizenJPanel registerPanel = 
+        new ui.login.RegisterCitizenJPanel(userProcessContainer, system);
+    
+    userProcessContainer.add(registerPanel, "Register");
+    
+    java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+    layout.show(userProcessContainer, "Register");
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegisterActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogin;
+    private javax.swing.JButton btnRegister;
     private javax.swing.JLabel lblPassword;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblUserName;

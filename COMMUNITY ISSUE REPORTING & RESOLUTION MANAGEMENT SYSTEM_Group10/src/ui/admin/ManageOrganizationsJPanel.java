@@ -4,7 +4,10 @@
  */
 package ui.admin;
 
+import java.awt.CardLayout;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.table.DefaultTableModel;
 import model.ecosystem.EcoSystem;
 
 /**
@@ -18,12 +21,64 @@ public class ManageOrganizationsJPanel extends javax.swing.JPanel {
      */
      private JPanel workArea;
     private EcoSystem ecoSystem;
+    private DefaultTableModel tableModel;
     
     
    public ManageOrganizationsJPanel(JPanel workArea, EcoSystem ecoSystem) {
     this.workArea = workArea;
     this.ecoSystem = ecoSystem;
     initComponents();
+    
+    setupTable();
+    loadEnterprises();
+    loadOrgTypes();
+    loadOrganizations();
+}
+   private void setupTable() {
+    tableModel = (DefaultTableModel) tblOrganizations.getModel();  
+    tblOrganizations.setRowHeight(25);  // ← Use table name
+    tblOrganizations.getTableHeader().setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));  
+}
+
+private void loadEnterprises() {
+    cmbEnterprise.removeAllItems();
+    try {
+        for (model.network.Network network : ecoSystem.getNetworks()) {
+            for (model.enterprise.Enterprise enterprise : network.getEnterprises()) {
+                cmbEnterprise.addItem(enterprise.getName());
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+private void loadOrgTypes() {
+    cmbOrgType.removeAllItems();
+    for (model.organization.Organization.OrganizationType type : model.organization.Organization.OrganizationType.values()) {
+        cmbOrgType.addItem(type.getValue());
+    }
+}
+
+private void loadOrganizations() {
+    tableModel.setRowCount(0);
+    try {
+        for (model.network.Network network : ecoSystem.getNetworks()) {
+            for (model.enterprise.Enterprise enterprise : network.getEnterprises()) {
+                for (model.organization.Organization org : enterprise.getOrganizations()) {
+                    Object[] row = {
+                        org.getName(),
+                        org.getOrganizationType().getValue(),
+                        enterprise.getName(),
+                        org.getUserAccounts().size()
+                    };
+                    tableModel.addRow(row);
+                }
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
 }
 
     /**
@@ -35,20 +90,383 @@ public class ManageOrganizationsJPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jPanel2 = new javax.swing.JPanel();
+        scrollPane = new javax.swing.JScrollPane();
+        tblOrganizations = new javax.swing.JTable();
+        formPanel = new javax.swing.JPanel();
+        lblFormTitle = new javax.swing.JLabel();
+        lblEnterprise = new javax.swing.JLabel();
+        cmbEnterprise = new javax.swing.JComboBox<>();
+        lblOrgName = new javax.swing.JLabel();
+        txtOrgName = new javax.swing.JTextField();
+        lblOrgType = new javax.swing.JLabel();
+        cmbOrgType = new javax.swing.JComboBox<>();
+        btnCreate = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
+        bottomPanel = new javax.swing.JPanel();
+        btnDelete = new javax.swing.JButton();
+        btnRefresh = new javax.swing.JButton();
+        btnBack = new javax.swing.JButton();
+
+        setLayout(new java.awt.BorderLayout());
+
+        jLabel1.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        jLabel1.setText("Manage Organization");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(278, 278, 278)
+                .addComponent(jLabel1)
+                .addContainerGap(485, Short.MAX_VALUE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(32, 32, 32)
+                .addComponent(jLabel1)
+                .addContainerGap(52, Short.MAX_VALUE))
         );
+
+        add(jPanel1, java.awt.BorderLayout.PAGE_START);
+
+        jSplitPane1.setDividerLocation(500);
+
+        tblOrganizations.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Organization Name", "Type", "Enterprise", "Total Users"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        scrollPane.setViewportView(tblOrganizations);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(42, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jSplitPane1.setLeftComponent(jPanel2);
+
+        lblFormTitle.setText("Create Organization");
+
+        lblEnterprise.setText("Enterprise:");
+
+        lblOrgName.setText("Organization Name:");
+
+        lblOrgType.setText("Organization Type:");
+
+        btnCreate.setText("Create Organization");
+        btnCreate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateActionPerformed(evt);
+            }
+        });
+
+        btnClear.setText("Clear");
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout formPanelLayout = new javax.swing.GroupLayout(formPanel);
+        formPanel.setLayout(formPanelLayout);
+        formPanelLayout.setHorizontalGroup(
+            formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(formPanelLayout.createSequentialGroup()
+                .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(formPanelLayout.createSequentialGroup()
+                        .addGap(89, 89, 89)
+                        .addComponent(lblFormTitle))
+                    .addGroup(formPanelLayout.createSequentialGroup()
+                        .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(formPanelLayout.createSequentialGroup()
+                                .addGap(41, 41, 41)
+                                .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblEnterprise)
+                                    .addComponent(lblOrgName)
+                                    .addComponent(lblOrgType)))
+                            .addGroup(formPanelLayout.createSequentialGroup()
+                                .addGap(25, 25, 25)
+                                .addComponent(btnCreate)))
+                        .addGap(29, 29, 29)
+                        .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnClear)
+                            .addComponent(txtOrgName)
+                            .addComponent(cmbEnterprise, 0, 139, Short.MAX_VALUE)
+                            .addComponent(cmbOrgType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(93, Short.MAX_VALUE))
+        );
+        formPanelLayout.setVerticalGroup(
+            formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(formPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblFormTitle)
+                .addGap(24, 24, 24)
+                .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEnterprise)
+                    .addComponent(cmbEnterprise, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblOrgName)
+                    .addComponent(txtOrgName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(25, 25, 25)
+                .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblOrgType)
+                    .addComponent(cmbOrgType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(37, 37, 37)
+                .addGroup(formPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnCreate)
+                    .addComponent(btnClear))
+                .addContainerGap(79, Short.MAX_VALUE))
+        );
+
+        jSplitPane1.setRightComponent(formPanel);
+
+        add(jSplitPane1, java.awt.BorderLayout.CENTER);
+
+        btnDelete.setText("Delete Selected");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
+
+        btnRefresh.setText("Refresh");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
+        btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout bottomPanelLayout = new javax.swing.GroupLayout(bottomPanel);
+        bottomPanel.setLayout(bottomPanelLayout);
+        bottomPanelLayout.setHorizontalGroup(
+            bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bottomPanelLayout.createSequentialGroup()
+                .addGap(104, 104, 104)
+                .addComponent(btnDelete)
+                .addGap(31, 31, 31)
+                .addComponent(btnRefresh)
+                .addGap(27, 27, 27)
+                .addComponent(btnBack)
+                .addContainerGap(509, Short.MAX_VALUE))
+        );
+        bottomPanelLayout.setVerticalGroup(
+            bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bottomPanelLayout.createSequentialGroup()
+                .addGap(36, 36, 36)
+                .addGroup(bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnDelete)
+                    .addComponent(btnRefresh)
+                    .addComponent(btnBack))
+                .addContainerGap(41, Short.MAX_VALUE))
+        );
+
+        add(bottomPanel, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
+
+String orgName = txtOrgName.getText().trim();
+    
+    if (orgName.isEmpty() || orgName.length() < 3) {
+        JOptionPane.showMessageDialog(this, "Organization name must be 3+ characters!", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    try {
+        String selectedEnterpriseName = (String) cmbEnterprise.getSelectedItem();
+        String selectedOrgTypeName = (String) cmbOrgType.getSelectedItem();
+        
+        model.enterprise.Enterprise selectedEnterprise = null;
+        for (model.network.Network network : ecoSystem.getNetworks()) {
+            for (model.enterprise.Enterprise enterprise : network.getEnterprises()) {
+                if (enterprise.getName().equals(selectedEnterpriseName)) {
+                    selectedEnterprise = enterprise;
+                    break;
+                }
+            }
+            if (selectedEnterprise != null) break;
+        }
+        
+        if (selectedEnterprise == null) {
+            JOptionPane.showMessageDialog(this, "Enterprise not found!", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        model.organization.Organization.OrganizationType orgType = null;
+        for (model.organization.Organization.OrganizationType type : model.organization.Organization.OrganizationType.values()) {
+            if (type.getValue().equals(selectedOrgTypeName)) {
+                orgType = type;
+                break;
+            }
+        }
+        
+        selectedEnterprise.createAndAddOrganization(orgName, orgType);
+        
+        JOptionPane.showMessageDialog(this, 
+            "Organization created: " + orgName, 
+            "Success", JOptionPane.INFORMATION_MESSAGE);
+        
+        txtOrgName.setText("");
+        loadOrganizations();
+        
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCreateActionPerformed
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+txtOrgName.setText("");
+    if (cmbEnterprise.getItemCount() > 0) cmbEnterprise.setSelectedIndex(0);
+    if (cmbOrgType.getItemCount() > 0) cmbOrgType.setSelectedIndex(0);
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnClearActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+        int selectedRow = tblOrganizations.getSelectedRow();
+    
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Please select an organization!", "No Selection", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    String orgName = (String) tableModel.getValueAt(selectedRow, 0);
+    int userCount = Integer.parseInt(tableModel.getValueAt(selectedRow, 3).toString());
+    
+    if (userCount > 0) {
+        JOptionPane.showMessageDialog(this, 
+            "Cannot delete! Organization has " + userCount + " users.", 
+            "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    int confirm = JOptionPane.showConfirmDialog(this,
+        "Delete organization: " + orgName + "?",
+        "Confirm Delete",
+        JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == JOptionPane.YES_OPTION) {
+        try {
+            boolean deleted = false;
+            
+            outerLoop:
+            for (model.network.Network network : ecoSystem.getNetworks()) {
+                for (model.enterprise.Enterprise enterprise : network.getEnterprises()) {
+                    model.organization.Organization toDelete = null;
+                    for (model.organization.Organization org : enterprise.getOrganizations()) {
+                        if (org.getName().equals(orgName)) {
+                            toDelete = org;
+                            break;
+                        }
+                    }
+                    if (toDelete != null) {
+                        enterprise.getOrganizations().remove(toDelete);
+                        deleted = true;
+                        break outerLoop;
+                    }
+                }
+            }
+            
+            if (deleted) {
+                JOptionPane.showMessageDialog(this, "Organization deleted!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadOrganizations();
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+        
+// TODO add your handling code here:
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+ loadOrganizations();
+    JOptionPane.showMessageDialog(this, "Refreshed!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+workArea.remove(this);
+    CardLayout layout = (CardLayout) workArea.getLayout();
+    layout.previous(workArea);
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnBackActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel bottomPanel;
+    private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnCreate;
+    private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnRefresh;
+    private javax.swing.JComboBox<String> cmbEnterprise;
+    private javax.swing.JComboBox<String> cmbOrgType;
+    private javax.swing.JPanel formPanel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JLabel lblEnterprise;
+    private javax.swing.JLabel lblFormTitle;
+    private javax.swing.JLabel lblOrgName;
+    private javax.swing.JLabel lblOrgType;
+    private javax.swing.JScrollPane scrollPane;
+    private javax.swing.JTable tblOrganizations;
+    private javax.swing.JTextField txtOrgName;
     // End of variables declaration//GEN-END:variables
 
 

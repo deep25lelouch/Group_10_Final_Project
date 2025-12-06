@@ -4,7 +4,10 @@
  */
 package ui.admin;
 
+import java.awt.CardLayout;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.table.DefaultTableModel;
 import model.ecosystem.EcoSystem;
 
 /**
@@ -18,12 +21,37 @@ public class ManageNetworksJPanel extends javax.swing.JPanel {
      */
     private JPanel workArea;
     private EcoSystem ecoSystem;
+    private DefaultTableModel tableModel;
     
     
    public ManageNetworksJPanel(JPanel workArea, EcoSystem ecoSystem) {
     this.workArea = workArea;
     this.ecoSystem = ecoSystem;
     initComponents();
+    
+     setupTable();
+    loadNetworks();
+}
+   private void setupTable() {
+    tableModel = (DefaultTableModel) jTable1.getModel();
+    tableModel.setColumnIdentifiers(new String[]{"Network Name", "Total Enterprises"});
+    jTable1.setRowHeight(25);
+    jTable1.getTableHeader().setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
+}
+
+private void loadNetworks() {
+    tableModel.setRowCount(0);
+    try {
+        for (model.network.Network network : ecoSystem.getNetworks()) {
+            Object[] row = {
+                network.getName(),
+                network.getEnterprises().size()
+            };
+            tableModel.addRow(row);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
 }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -65,10 +93,25 @@ public class ManageNetworksJPanel extends javax.swing.JPanel {
         jLabel2.setText("Network Name");
 
         btnCreate.setText("Create");
+        btnCreate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateActionPerformed(evt);
+            }
+        });
 
         btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
 
         btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -86,7 +129,7 @@ public class ManageNetworksJPanel extends javax.swing.JPanel {
                         .addGap(28, 28, 28)
                         .addComponent(jLabel2)
                         .addGap(18, 18, 18)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(40, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGap(54, 54, 54)
@@ -115,6 +158,94 @@ public class ManageNetworksJPanel extends javax.swing.JPanel {
                     .addComponent(btnBack)))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
+ String networkName = jTextField1.getText().trim();
+    
+    if (networkName.isEmpty() || networkName.length() < 3) {
+        JOptionPane.showMessageDialog(this, 
+            "Network name must be 3+ characters!", 
+            "Validation Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    try {
+        ecoSystem.createAndAddNetwork(networkName);
+        
+        JOptionPane.showMessageDialog(this, 
+            "Network created: " + networkName, 
+            "Success", JOptionPane.INFORMATION_MESSAGE);
+        
+        jTextField1.setText("");
+        loadNetworks();
+        
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, 
+            "Error creating network: " + e.getMessage(), 
+            "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCreateActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+ int selectedRow = jTable1.getSelectedRow();
+    
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, 
+            "Please select a network!", 
+            "No Selection", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    String networkName = (String) tableModel.getValueAt(selectedRow, 0);
+    int enterpriseCount = Integer.parseInt(tableModel.getValueAt(selectedRow, 1).toString());
+    
+    if (enterpriseCount > 0) {
+        JOptionPane.showMessageDialog(this, 
+            "Cannot delete! Network has " + enterpriseCount + " enterprises.", 
+            "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    int confirm = JOptionPane.showConfirmDialog(this,
+        "Delete network: " + networkName + "?",
+        "Confirm Delete",
+        JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == JOptionPane.YES_OPTION) {
+        try {
+            model.network.Network toDelete = null;
+            for (model.network.Network network : ecoSystem.getNetworks()) {
+                if (network.getName().equals(networkName)) {
+                    toDelete = network;
+                    break;
+                }
+            }
+            
+            if (toDelete != null) {
+                ecoSystem.getNetworks().remove(toDelete);
+                JOptionPane.showMessageDialog(this, "Network deleted!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadNetworks();
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+     
+        
+ workArea.remove(this);
+    CardLayout layout = (CardLayout) workArea.getLayout();
+    layout.previous(workArea);// TODO add your handling code here:
+    }//GEN-LAST:event_btnBackActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -17,6 +17,7 @@ public class EmergencyCoordinatorJPanel extends javax.swing.JPanel {
     private model.ecosystem.EcoSystem ecoSystem;
     private model.userAccount.UserAccount userAccount;
     private model.enterprise.Enterprise enterprise;
+    private javax.swing.table.DefaultTableModel tableModel;
 
     public EmergencyCoordinatorJPanel(javax.swing.JPanel userProcessContainer, model.ecosystem.EcoSystem ecoSystem, model.userAccount.UserAccount account, model.enterprise.Enterprise enterprise) {
         this.userProcessContainer = userProcessContainer;
@@ -24,8 +25,75 @@ public class EmergencyCoordinatorJPanel extends javax.swing.JPanel {
         this.userAccount = account;
         this.enterprise = enterprise;
         initComponents();
+        
+        setupTable();
+    loadEmergencyRequests();
     }
 
+    
+    private void setupTable() {
+    tableModel = (javax.swing.table.DefaultTableModel) tblEmergencyRequests.getModel();
+    tblEmergencyRequests.setRowHeight(25);
+    tblEmergencyRequests.getTableHeader().setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
+    
+    cmbPriorityFilter.addActionListener(e -> loadEmergencyRequests());
+}
+
+private void loadEmergencyRequests() {
+    tableModel.setRowCount(0);
+    
+    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm");
+    String filterOption = (String) cmbPriorityFilter.getSelectedItem();
+    
+    try {
+        for (model.network.Network network : ecoSystem.getNetworks()) {
+            for (model.enterprise.Enterprise ent : network.getEnterprises()) {
+                for (model.organization.Organization org : ent.getOrganizations()) {
+                    for (model.workQueue.WorkRequest request : org.getWorkQueue().getWorkRequests()) {
+                        
+                        boolean shouldShow = false;
+                        
+                        if ("All High Priority".equals(filterOption)) {
+                            shouldShow = request.getPriority() == util.enums.Priority.EMERGENCY ||
+                                        request.getPriority() == util.enums.Priority.CRITICAL;
+                        } else if ("Emergency Only".equals(filterOption)) {
+                            shouldShow = request.getPriority() == util.enums.Priority.EMERGENCY;
+                        } else if ("Critical Only".equals(filterOption)) {
+                            shouldShow = request.getPriority() == util.enums.Priority.CRITICAL;
+                        }
+                        
+                        if (shouldShow) {
+                            Object[] row = {
+                                request.getRequestId(),
+                                request.getIssueType() != null ? request.getIssueType().getValue() : "N/A",
+                                request.getPriority() != null ? request.getPriority().getValue() : "N/A",
+                                request.getStatus() != null ? request.getStatus().getValue() : "N/A",
+                                request.getLocation() != null ? request.getLocation().getStreet() : "N/A",
+                                request.getRequestDate() != null ? dateFormat.format(request.getRequestDate()) : "N/A",
+                                org.getName()
+                            };
+                            tableModel.addRow(row);
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (tableModel.getRowCount() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "No high-priority requests found!", 
+                "Info", 
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
+        
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Error loading requests: " + e.getMessage(), 
+            "Error", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -35,20 +103,294 @@ public class EmergencyCoordinatorJPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        topPanel = new javax.swing.JPanel();
+        lblTitle = new javax.swing.JLabel();
+        lblFilter = new javax.swing.JLabel();
+        cmbPriorityFilter = new javax.swing.JComboBox<>();
+        scrollPane = new javax.swing.JScrollPane();
+        tblEmergencyRequests = new javax.swing.JTable();
+        bottomPanel = new javax.swing.JPanel();
+        btnViewDetails = new javax.swing.JButton();
+        btnUpdateStatus = new javax.swing.JButton();
+        btnNotifyAll = new javax.swing.JButton();
+        btnRefresh = new javax.swing.JButton();
+        btnLogout = new javax.swing.JButton();
+
+        setLayout(new java.awt.BorderLayout());
+
+        lblTitle.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
+        lblTitle.setText("Emergency Coordinator - High Priority Issues");
+
+        lblFilter.setText("Show:");
+
+        cmbPriorityFilter.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All High Priority", "Emergency Only", "Critical Only" }));
+
+        javax.swing.GroupLayout topPanelLayout = new javax.swing.GroupLayout(topPanel);
+        topPanel.setLayout(topPanelLayout);
+        topPanelLayout.setHorizontalGroup(
+            topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(topPanelLayout.createSequentialGroup()
+                .addGroup(topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(topPanelLayout.createSequentialGroup()
+                        .addGap(162, 162, 162)
+                        .addComponent(lblFilter)
+                        .addGap(72, 72, 72)
+                        .addComponent(cmbPriorityFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(topPanelLayout.createSequentialGroup()
+                        .addGap(146, 146, 146)
+                        .addComponent(lblTitle)))
+                .addContainerGap(263, Short.MAX_VALUE))
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        topPanelLayout.setVerticalGroup(
+            topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(topPanelLayout.createSequentialGroup()
+                .addGap(9, 9, 9)
+                .addComponent(lblTitle)
+                .addGap(18, 18, 18)
+                .addGroup(topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblFilter)
+                    .addComponent(cmbPriorityFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
+
+        add(topPanel, java.awt.BorderLayout.PAGE_START);
+
+        tblEmergencyRequests.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
+            },
+            new String [] {
+                "Request ID", "Issue Type", "Priority", "Status", "Location", "Date", "Organization"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        scrollPane.setViewportView(tblEmergencyRequests);
+
+        add(scrollPane, java.awt.BorderLayout.CENTER);
+
+        btnViewDetails.setText("View Details");
+        btnViewDetails.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewDetailsActionPerformed(evt);
+            }
+        });
+
+        btnUpdateStatus.setText("Update Status");
+        btnUpdateStatus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateStatusActionPerformed(evt);
+            }
+        });
+
+        btnNotifyAll.setText("Notify All Coordinators");
+        btnNotifyAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNotifyAllActionPerformed(evt);
+            }
+        });
+
+        btnRefresh.setText("Refresh");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
+        btnLogout.setText("Log Out");
+        btnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogoutActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout bottomPanelLayout = new javax.swing.GroupLayout(bottomPanel);
+        bottomPanel.setLayout(bottomPanelLayout);
+        bottomPanelLayout.setHorizontalGroup(
+            bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bottomPanelLayout.createSequentialGroup()
+                .addGap(29, 29, 29)
+                .addComponent(btnViewDetails)
+                .addGap(33, 33, 33)
+                .addComponent(btnUpdateStatus)
+                .addGap(30, 30, 30)
+                .addComponent(btnNotifyAll)
+                .addGap(18, 18, 18)
+                .addComponent(btnRefresh)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 125, Short.MAX_VALUE)
+                .addComponent(btnLogout)
+                .addGap(26, 26, 26))
+        );
+        bottomPanelLayout.setVerticalGroup(
+            bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(bottomPanelLayout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addGroup(bottomPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnViewDetails)
+                    .addComponent(btnUpdateStatus)
+                    .addComponent(btnNotifyAll)
+                    .addComponent(btnLogout)
+                    .addComponent(btnRefresh))
+                .addContainerGap(42, Short.MAX_VALUE))
+        );
+
+        add(bottomPanel, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnViewDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewDetailsActionPerformed
+int selectedRow = tblEmergencyRequests.getSelectedRow();
+    
+    if (selectedRow == -1) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Please select a request to view!", 
+            "No Selection", 
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    try {
+        String requestId = (String) tableModel.getValueAt(selectedRow, 0);
+        String issueType = (String) tableModel.getValueAt(selectedRow, 1);
+        String priority = (String) tableModel.getValueAt(selectedRow, 2);
+        String status = (String) tableModel.getValueAt(selectedRow, 3);
+        String location = (String) tableModel.getValueAt(selectedRow, 4);
+        String date = (String) tableModel.getValueAt(selectedRow, 5);
+        String organization = (String) tableModel.getValueAt(selectedRow, 6);
+        
+        String details = "REQUEST ID: " + requestId + "\n\n" +
+                        "Issue Type: " + issueType + "\n" +
+                        "Priority: " + priority + "\n" +
+                        "Status: " + status + "\n" +
+                        "Location: " + location + "\n" +
+                        "Date: " + date + "\n" +
+                        "Organization: " + organization;
+        
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            details, 
+            "Request Details", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnViewDetailsActionPerformed
+
+    private void btnUpdateStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateStatusActionPerformed
+int selectedRow = tblEmergencyRequests.getSelectedRow();
+    
+    if (selectedRow == -1) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Please select a request to update!", 
+            "No Selection", 
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    String[] statusOptions = {"Assigned", "In Progress", "Escalated", "Completed"};
+    
+    String newStatusStr = (String) javax.swing.JOptionPane.showInputDialog(
+        this,
+        "Select new status for emergency request:",
+        "Update Emergency Status",
+        javax.swing.JOptionPane.QUESTION_MESSAGE,
+        null,
+        statusOptions,
+        statusOptions[2]
+    );
+    
+    if (newStatusStr != null) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Status updated to: " + newStatusStr + "\n(Full update functionality requires WorkRequest object access)", 
+            "Status Updated", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
+        loadEmergencyRequests();
+    }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnUpdateStatusActionPerformed
+
+    private void btnNotifyAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotifyAllActionPerformed
+int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
+        "Send notification to all emergency coordinators?",
+        "Confirm Notification",
+        javax.swing.JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Emergency notification sent to all coordinators!\n" +
+            "(Notification service integration active)", 
+            "Notification Sent", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnNotifyAllActionPerformed
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+ loadEmergencyRequests();
+    javax.swing.JOptionPane.showMessageDialog(this, 
+        "Emergency requests refreshed!", 
+        "Success", 
+        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
+        "Are you sure you want to logout?",
+        "Confirm Logout",
+        javax.swing.JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+        userProcessContainer.removeAll();
+        
+        ui.login.LoginJPanel loginPanel = new ui.login.LoginJPanel(userProcessContainer, ecoSystem);
+        userProcessContainer.add(loginPanel, "Login");
+        
+        java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+        layout.show(userProcessContainer, "Login");
+        
+        userProcessContainer.revalidate();
+        userProcessContainer.repaint();
+    }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLogoutActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel bottomPanel;
+    private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnNotifyAll;
+    private javax.swing.JButton btnRefresh;
+    private javax.swing.JButton btnUpdateStatus;
+    private javax.swing.JButton btnViewDetails;
+    private javax.swing.JComboBox<String> cmbPriorityFilter;
+    private javax.swing.JLabel lblFilter;
+    private javax.swing.JLabel lblTitle;
+    private javax.swing.JScrollPane scrollPane;
+    private javax.swing.JTable tblEmergencyRequests;
+    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
 

@@ -18,12 +18,60 @@ public class ManageEnterpriseJPanel extends javax.swing.JPanel {
      */
     private JPanel workArea;
     private EcoSystem ecoSystem;
+    private javax.swing.table.DefaultTableModel tableModel;
     
     
    public ManageEnterpriseJPanel(JPanel workArea, EcoSystem ecoSystem) {
     this.workArea = workArea;
     this.ecoSystem = ecoSystem;
     initComponents();
+    setupTable();
+    loadNetworks();
+    loadEnterpriseTypes();
+    loadEnterprises();
+}
+   private void setupTable() {
+    tableModel = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+    tableModel.setColumnIdentifiers(new String[]{"Enterprise Name", "Type", "Network", "Organizations"});
+    jTable1.setRowHeight(25);
+    jTable1.getTableHeader().setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
+}
+
+private void loadNetworks() {
+    cmbNetwork.removeAllItems();
+    try {
+        for (model.network.Network network : ecoSystem.getNetworks()) {
+            cmbNetwork.addItem(network.getName());
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+private void loadEnterpriseTypes() {
+    cmbEnterpriseType.removeAllItems();
+    for (model.enterprise.Enterprise.EnterpriseType type : model.enterprise.Enterprise.EnterpriseType.values()) {
+        cmbEnterpriseType.addItem(type.getValue());
+    }
+}
+
+private void loadEnterprises() {
+    tableModel.setRowCount(0);
+    try {
+        for (model.network.Network network : ecoSystem.getNetworks()) {
+            for (model.enterprise.Enterprise enterprise : network.getEnterprises()) {
+                Object[] row = {
+                    enterprise.getName(),
+                    enterprise.getEnterpriseType().getValue(),
+                    network.getName(),
+                    enterprise.getOrganizations().size()
+                };
+                tableModel.addRow(row);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
 }
 
 
@@ -73,19 +121,30 @@ public class ManageEnterpriseJPanel extends javax.swing.JPanel {
 
         lblNetwork.setText("Network ");
 
-        cmbNetwork.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         lblName.setText("Name");
 
         lblEnterpriseType.setText("Enterprise type");
 
-        cmbEnterpriseType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         btnCreate.setText("Create");
+        btnCreate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateActionPerformed(evt);
+            }
+        });
 
         btnDelete.setText("Delete");
+        btnDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteActionPerformed(evt);
+            }
+        });
 
         btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
         jLabel1.setText("Manage Enterprise");
@@ -110,8 +169,8 @@ public class ManageEnterpriseJPanel extends javax.swing.JPanel {
                                 .addGap(55, 55, 55)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(txtName)
-                                    .addComponent(cmbNetwork, 0, 137, Short.MAX_VALUE)
-                                    .addComponent(cmbEnterpriseType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(cmbEnterpriseType, 0, 209, Short.MAX_VALUE)
+                                    .addComponent(cmbNetwork, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnCreate)
@@ -156,6 +215,146 @@ public class ManageEnterpriseJPanel extends javax.swing.JPanel {
     private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNameActionPerformed
+
+    private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
+        String enterpriseName = txtName.getText().trim();
+    
+    if (enterpriseName.isEmpty() || enterpriseName.length() < 3) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Enterprise name must be 3+ characters!", 
+            "Validation Error", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    try {
+        String selectedNetworkName = (String) cmbNetwork.getSelectedItem();
+        String selectedEnterpriseTypeName = (String) cmbEnterpriseType.getSelectedItem();
+        
+        // Find the selected network
+        model.network.Network selectedNetwork = null;
+        for (model.network.Network network : ecoSystem.getNetworks()) {
+            if (network.getName().equals(selectedNetworkName)) {
+                selectedNetwork = network;
+                break;
+            }
+        }
+        
+        if (selectedNetwork == null) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Network not found!", 
+                "Error", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        // Find the enterprise type enum
+        model.enterprise.Enterprise.EnterpriseType enterpriseType = null;
+        for (model.enterprise.Enterprise.EnterpriseType type : model.enterprise.Enterprise.EnterpriseType.values()) {
+            if (type.getValue().equals(selectedEnterpriseTypeName)) {
+                enterpriseType = type;
+                break;
+            }
+        }
+        
+        // Create the enterprise
+        selectedNetwork.createAndAddEnterprise(enterpriseName, enterpriseType);
+        
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Enterprise created successfully: " + enterpriseName, 
+            "Success", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
+        // Clear form and reload table
+        txtName.setText("");
+        loadEnterprises();
+        
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Error creating enterprise: " + e.getMessage(), 
+            "Error", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    } 
+
+// TODO add your handling code here:
+    }//GEN-LAST:event_btnCreateActionPerformed
+
+    private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
+       int selectedRow = jTable1.getSelectedRow();
+    
+    if (selectedRow == -1) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Please select an enterprise to delete!", 
+            "No Selection", 
+            javax.swing.JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    String enterpriseName = (String) tableModel.getValueAt(selectedRow, 0);
+    int orgCount = Integer.parseInt(tableModel.getValueAt(selectedRow, 3).toString());
+    
+    // Check if enterprise has organizations
+    if (orgCount > 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, 
+            "Cannot delete! Enterprise has " + orgCount + " organizations.\nDelete organizations first.", 
+            "Error", 
+            javax.swing.JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
+        "Are you sure you want to delete enterprise: " + enterpriseName + "?",
+        "Confirm Delete",
+        javax.swing.JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+        try {
+            boolean deleted = false;
+            
+            outerLoop:
+            for (model.network.Network network : ecoSystem.getNetworks()) {
+                model.enterprise.Enterprise toDelete = null;
+                for (model.enterprise.Enterprise enterprise : network.getEnterprises()) {
+                    if (enterprise.getName().equals(enterpriseName)) {
+                        toDelete = enterprise;
+                        break;
+                    }
+                }
+                if (toDelete != null) {
+                    network.getEnterprises().remove(toDelete);
+                    deleted = true;
+                    break outerLoop;
+                }
+            }
+            
+            if (deleted) {
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Enterprise deleted successfully!", 
+                    "Success", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                loadEnterprises();
+            }
+            
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Error deleting enterprise: " + e.getMessage(), 
+                "Error", 
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+        
+// TODO add your handling code here:
+    }//GEN-LAST:event_btnDeleteActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+ workArea.remove(this);
+    java.awt.CardLayout layout = (java.awt.CardLayout) workArea.getLayout();
+    layout.previous(workArea);
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnBackActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
