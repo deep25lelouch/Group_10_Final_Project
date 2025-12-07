@@ -332,7 +332,11 @@ public class WorkRequestDetailsJPanel extends javax.swing.JPanel {
 
                 targetOrg.getWorkQueue().addWorkRequest(crossRequest);
                 request.linkRequest(crossRequest);
-                
+                for(model.userAccount.UserAccount ua : targetOrg.getUserAccounts()){
+                    if(ua.getRole().toString().contains("Admin") || ua.getRole().toString().contains("Supervisor")){
+                        business.notification.NotificationService.notifyEscalation(ua, crossRequest);
+                    }
+                }
                 javax.swing.JOptionPane.showMessageDialog(this, 
                     "Success! Request routed to " + targetOrg.getName(),
                     "Routing Complete", 
