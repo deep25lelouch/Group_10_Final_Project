@@ -118,23 +118,46 @@ userProcessContainer.setLayout(cardLayout);
     cardLayout.show(userProcessContainer, name);
 }
 // STEP 1: ROUTING BASED ON ROLE
-public void loadDashboard(model.userAccount.UserAccount user) {
+// Inside src/ui/main/MainJFrame.java
 
+public void loadDashboard(model.userAccount.UserAccount user) {
     // Clear screen
     userProcessContainer.removeAll();
 
+    // 1. FIND CONTEXT: Determine which Network, Enterprise, and Organization this user belongs to
+    model.network.Network inNetwork = null;
+    model.enterprise.Enterprise inEnterprise = null;
+    model.organization.Organization inOrganization = null;
+
+    // Search the entire ecosystem
+    searchLoop:
+    for (model.network.Network network : ecoSystem.getNetworks()) {
+        for (model.enterprise.Enterprise ent : network.getEnterprises()) {
+            for (model.organization.Organization org : ent.getOrganizations()) {
+                for (model.userAccount.UserAccount ua : org.getUserAccounts()) {
+                    if (ua.getUsername().equals(user.getUsername())) {
+                        inNetwork = network;
+                        inEnterprise = ent;
+                        inOrganization = org;
+                        break searchLoop; // Found the user, stop searching
+                    }
+                }
+            }
+        }
+    }
+
+    // 2. LOAD DASHBOARD: Pass the found Enterprise/Organization to the Role
+    // This fixes the "null" issue because we now pass 'inOrganization' and 'inEnterprise'
     javax.swing.JPanel workArea = user.getRole().createWorkArea(
             userProcessContainer,
             user,
-            null,    // organization (if needed inside role)
-            null,    // enterprise (if needed inside role)
+            inOrganization, // <--- Was null, now passing correct Org
+            inEnterprise,   // <--- Was null, now passing correct Enterprise (Critical for Supervisor)
             ecoSystem
     );
 
     userProcessContainer.add("WorkArea", workArea);
-
     java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
     layout.next(userProcessContainer);
 }
-
 }

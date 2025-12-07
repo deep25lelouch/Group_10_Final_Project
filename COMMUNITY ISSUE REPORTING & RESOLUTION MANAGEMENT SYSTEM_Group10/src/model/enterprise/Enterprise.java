@@ -22,7 +22,8 @@ public class Enterprise {
         PUBLIC_WORKS("Public Works"),
         UTILITIES("Utilities"),
         PUBLIC_SAFETY_ENVIRONMENT("Public Safety & Environment"),
-        EMERGENCY_MANAGEMENT("Emergency Management");
+        EMERGENCY_MANAGEMENT("Emergency Management"),
+        RESIDENT_SERVICES("Resident Services");
 
         private String value;
 

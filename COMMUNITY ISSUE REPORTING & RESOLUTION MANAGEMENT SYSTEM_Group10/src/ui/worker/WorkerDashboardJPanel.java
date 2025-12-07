@@ -47,7 +47,7 @@ private void customizeUI() {
     }
 }
 
-private void loadWorkRequests() {
+public void loadWorkRequests() {
     tableModel.setRowCount(0);
     
     if (userAccount == null) {
@@ -108,6 +108,7 @@ private void loadWorkRequests() {
         lblWelcome = new javax.swing.JLabel();
         lblPendingTasks = new javax.swing.JLabel();
         lblCompletedTasks = new javax.swing.JLabel();
+        btnInbox = new javax.swing.JButton();
         scrollPane = new javax.swing.JScrollPane();
         tblWorkRequests = new javax.swing.JTable();
         bottomPanel = new javax.swing.JPanel();
@@ -126,6 +127,13 @@ private void loadWorkRequests() {
 
         lblCompletedTasks.setText("Completed:0");
 
+        btnInbox.setText("Inbox");
+        btnInbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInboxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout topPanelLayout = new javax.swing.GroupLayout(topPanel);
         topPanel.setLayout(topPanelLayout);
         topPanelLayout.setHorizontalGroup(
@@ -137,16 +145,23 @@ private void loadWorkRequests() {
                 .addComponent(lblPendingTasks)
                 .addGap(137, 137, 137)
                 .addComponent(lblCompletedTasks)
-                .addContainerGap(468, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 392, Short.MAX_VALUE)
+                .addComponent(btnInbox)
+                .addContainerGap())
         );
         topPanelLayout.setVerticalGroup(
             topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(topPanelLayout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblWelcome)
-                    .addComponent(lblPendingTasks)
-                    .addComponent(lblCompletedTasks))
+                .addGroup(topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(topPanelLayout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addGroup(topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblWelcome)
+                            .addComponent(lblPendingTasks)
+                            .addComponent(lblCompletedTasks)))
+                    .addGroup(topPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btnInbox)))
                 .addContainerGap(64, Short.MAX_VALUE))
         );
 
@@ -241,12 +256,46 @@ private void loadWorkRequests() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnViewDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewDetailsActionPerformed
-        javax.swing.JOptionPane.showMessageDialog(this, 
-        "View Details - Coming soon!", 
-        "Info", 
-        javax.swing.JOptionPane.INFORMATION_MESSAGE);
-
-        // TODO add your handling code here:
+                                                     
+        int selectedRow = tblWorkRequests.getSelectedRow();
+        
+        if (selectedRow < 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, 
+                "Please select a request to view details.", 
+                "No Selection", 
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // 1. Get Request ID from the selected row (Column 0)
+        String requestId = (String) tableModel.getValueAt(selectedRow, 0);
+        
+        // 2. Find the actual WorkRequest object from the user's queue
+        model.workQueue.WorkRequest selectedRequest = null;
+        for (model.workQueue.WorkRequest request : userAccount.getWorkQueue().getWorkRequests()) {
+            if (request.getRequestId().equals(requestId)) {
+                selectedRequest = request;
+                break;
+            }
+        }
+        
+        // 3. Navigate to the Details Panel
+        if (selectedRequest != null) {
+            // Pass 'this.userProcessContainer', 'this.ecoSystem', 'this.userAccount', and the request
+            WorkRequestDetailsJPanel detailsPanel = new WorkRequestDetailsJPanel(
+                userProcessContainer, 
+                ecoSystem, 
+                userAccount, 
+                selectedRequest
+            );
+            
+            userProcessContainer.add("WorkRequestDetailsJPanel", detailsPanel);
+            java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+            layout.next(userProcessContainer);
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Request not found (Data inconsistency).");
+        }
+    
     }//GEN-LAST:event_btnViewDetailsActionPerformed
 
     private void btnUpdateStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateStatusActionPerformed
@@ -370,9 +419,18 @@ private void loadWorkRequests() {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnLogoutActionPerformed
 
+    private void btnInboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInboxActionPerformed
+        // TODO add your handling code here:
+        ui.common.ViewNotificationsJPanel inboxPanel = new ui.common.ViewNotificationsJPanel(userProcessContainer, userAccount);
+    userProcessContainer.add("Inbox", inboxPanel);
+    java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+    layout.next(userProcessContainer);
+    }//GEN-LAST:event_btnInboxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bottomPanel;
+    private javax.swing.JButton btnInbox;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnUpdateStatus;
