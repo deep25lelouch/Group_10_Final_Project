@@ -50,6 +50,7 @@ public class WorkRequestDetailsJPanel extends javax.swing.JPanel {
         btnAddNote = new javax.swing.JButton();
         btnEscalate = new javax.swing.JButton();
         lblLinked = new javax.swing.JLabel();
+        btnMap = new javax.swing.JButton();
 
         lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lblTitle.setText("Work Request Details:");
@@ -105,6 +106,13 @@ public class WorkRequestDetailsJPanel extends javax.swing.JPanel {
 
         lblLinked.setText("linked request:");
 
+        btnMap.setText("Map");
+        btnMap.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMapActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -123,7 +131,7 @@ public class WorkRequestDetailsJPanel extends javax.swing.JPanel {
                                 .addGap(126, 126, 126)
                                 .addComponent(lblLinked))
                             .addComponent(lblTitle))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(515, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
@@ -140,9 +148,11 @@ public class WorkRequestDetailsJPanel extends javax.swing.JPanel {
                                 .addComponent(btnComplete)
                                 .addGap(104, 104, 104)
                                 .addComponent(btnEscalate)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 74, Short.MAX_VALUE)
                                 .addComponent(btnAddNote)))
-                        .addGap(68, 68, 68))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnMap, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(19, 19, 19))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -164,8 +174,9 @@ public class WorkRequestDetailsJPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtLocation))
-                .addGap(30, 30, 30)
+                    .addComponent(txtLocation)
+                    .addComponent(btnMap))
+                .addGap(29, 29, 29)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblDescription)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -227,69 +238,128 @@ public class WorkRequestDetailsJPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         // 1. Ask the worker what the related issue is
         util.enums.IssueType[] options = util.enums.IssueType.values();
-        util.enums.IssueType selectedType = (util.enums.IssueType) javax.swing.JOptionPane.showInputDialog(
-                this,
-                "Select the related issue type (e.g., Road Damage):",
-                "Cross-Department Escalation",
-                javax.swing.JOptionPane.QUESTION_MESSAGE,
-                null,
-                options,
-                options[0]);
+    util.enums.IssueType selectedType = (util.enums.IssueType) javax.swing.JOptionPane.showInputDialog(
+            this,
+            "Select the related issue type (e.g., Road Damage):",
+            "Cross-Department Escalation",
+            javax.swing.JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[0]);
 
-        if (selectedType != null) {
-            try {
-                // 2. Create the linked request
+    if (selectedType != null) {
+        try {
+            // --- FIND CURRENT CONTEXT (FROM) ---
+            model.enterprise.Enterprise currentEnt = null;
+            model.organization.Organization currentOrg = null;
+            
+            // Search ecosystem to find where the current user belongs
+            searchLoop:
+            for (model.network.Network net : ecoSystem.getNetworks()) {
+                for (model.enterprise.Enterprise ent : net.getEnterprises()) {
+                    for (model.organization.Organization org : ent.getOrganizations()) {
+                        for (model.userAccount.UserAccount ua : org.getUserAccounts()) {
+                            if (ua.getUsername().equals(userAccount.getUsername())) {
+                                currentEnt = ent;
+                                currentOrg = org;
+                                break searchLoop;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // --- DETERMINE TARGET (TO) ---
+            model.workQueue.WorkRequest dummyRequest = new model.workQueue.WorkRequest();
+            dummyRequest.setIssueType(selectedType);
+            
+            model.network.Network network = ecoSystem.getNetworks().get(0); 
+            model.enterprise.Enterprise targetEnt = business.routing.WorkRequestRouter.routeToEnterprise(dummyRequest, network);
+            model.organization.Organization targetOrg = null;
+            
+            if (targetEnt != null) {
+                targetOrg = business.routing.WorkRequestRouter.routeToOrganization(dummyRequest, targetEnt);
+            }
+
+            // --- VISUAL PROOF FOR PROFESSOR ---
+            if (currentEnt != null && targetEnt != null && targetOrg != null) {
+                
+                // Check if it is actually Cross-Enterprise
+                boolean isCrossEnterprise = !currentEnt.getName().equals(targetEnt.getName());
+                String protocol = isCrossEnterprise ? "CROSS-ENTERPRISE PROTOCOL" : "INTERNAL ESCALATION";
+                
+                String message = String.format(
+                    "<html><h2>%s DETECTED</h2>" +
+                    "<b>From:</b> <font color='red'>%s</font> (%s)<br>" +
+                    "<b>To:</b>  <font color='green'>%s</font> (%s)<br><br>" +
+                    "Reason: Issue Type <b>'%s'</b> requires %s expertise.<br>" +
+                    "Action: Creating linked request and routing automatically.<br><br>" +
+                    "Proceed?</html>",
+                    protocol,
+                    currentEnt.getName(), currentOrg.getName(),
+                    targetEnt.getName(), targetOrg.getName(),
+                    selectedType.getValue(), targetEnt.getName()
+                );
+
+                int confirm = javax.swing.JOptionPane.showConfirmDialog(this, message, "Confirm Routing", javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.WARNING_MESSAGE);
+                
+                if (confirm != javax.swing.JOptionPane.YES_OPTION) {
+                    return; 
+                }
+            }
+            
+            // --- CREATE AND ROUTE ---
+            if (targetEnt != null && targetOrg != null) {
                 model.workQueue.WorkRequest crossRequest = new model.workQueue.WorkRequest();
                 crossRequest.setIssueType(selectedType);
-                crossRequest.setPriority(util.enums.Priority.HIGH); // Escalations are usually high priority
+                crossRequest.setPriority(util.enums.Priority.HIGH);
                 crossRequest.setStatus(util.enums.Status.NEW);
                 
-                // Link description to original
                 crossRequest.setDescription("ESCALATED via Request " + request.getRequestId() + 
                                           " by " + userAccount.getUsername() + ": " + 
                                           request.getDescription());
                 
-                // Copy location (same physical spot)
                 crossRequest.setLocation(request.getLocation());
-                crossRequest.setCitizenId(request.getCitizenId()); // Keep original citizen linked
-                crossRequest.setSender(userAccount); // The WORKER is the sender of this internal request
+                crossRequest.setCitizenId(request.getCitizenId());
+                crossRequest.setSender(userAccount);
 
-                // 3. ROUTING MAGIC: Find the target Enterprise/Org
-                // We assume we are in the first network for this demo
-                model.network.Network network = ecoSystem.getNetworks().get(0);
+                targetOrg.getWorkQueue().addWorkRequest(crossRequest);
+                request.linkRequest(crossRequest);
                 
-                model.enterprise.Enterprise targetEnt = business.routing.WorkRequestRouter.routeToEnterprise(crossRequest, network);
-                
-                if (targetEnt != null) {
-                    model.organization.Organization targetOrg = business.routing.WorkRequestRouter.routeToOrganization(crossRequest, targetEnt);
+                javax.swing.JOptionPane.showMessageDialog(this, 
+                    "Success! Request routed to " + targetOrg.getName(),
+                    "Routing Complete", 
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
                     
-                    if (targetOrg != null) {
-                        // 4. Send it!
-                        targetOrg.getWorkQueue().addWorkRequest(crossRequest);
-                        
-                        // 5. Link it in the model (Two-way link)
-                        request.linkRequest(crossRequest);
-                        
-                        // Notify
-                        javax.swing.JOptionPane.showMessageDialog(this, 
-                            "Success! Linked Request " + crossRequest.getRequestId() + 
-                            "\nhas been sent to: " + targetEnt.getName() + " / " + targetOrg.getName(),
-                            "Cross-Enterprise Collaboration", 
-                            javax.swing.JOptionPane.INFORMATION_MESSAGE);
-                            
-                    } else {
-                        javax.swing.JOptionPane.showMessageDialog(this, "Could not find an Organization to handle " + selectedType.getValue());
-                    }
-                } else {
-                    javax.swing.JOptionPane.showMessageDialog(this, "Could not find an Enterprise to handle " + selectedType.getValue());
-                }
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-                javax.swing.JOptionPane.showMessageDialog(this, "Error escalating: " + e.getMessage());
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Could not find a target Organization.");
             }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
     }//GEN-LAST:event_btnEscalateActionPerformed
+
+    private void btnMapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapActionPerformed
+        // TODO add your handling code here:
+        if (request.getLocation() != null) {
+        try {
+            // Generate Google Maps URL
+            double lat = request.getLocation().getLatitude();
+            double lon = request.getLocation().getLongitude();
+            String url = "https://www.google.com/maps/search/?api=1&query=" + lat + "," + lon;
+            
+            // Open in default browser
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Error opening map: " + e.getMessage());
+        }
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "No location data available.");
+    }
+    }//GEN-LAST:event_btnMapActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -297,6 +367,7 @@ public class WorkRequestDetailsJPanel extends javax.swing.JPanel {
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnComplete;
     private javax.swing.JButton btnEscalate;
+    private javax.swing.JButton btnMap;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCitizen;
     private javax.swing.JLabel lblDate;

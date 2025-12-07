@@ -3,6 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package ui.manager;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.data.general.DefaultPieDataset;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.util.Map;
+import util.enums.IssueType;
 
 /**
  *
@@ -25,6 +34,7 @@ public class ManagerDashboardJPanel extends javax.swing.JPanel {
         this.enterprise = enterprise;
         initComponents();
         loadAnalytics();
+        populateChart();
     }
     private void loadAnalytics() {
     if (enterprise == null) {
@@ -77,7 +87,51 @@ public class ManagerDashboardJPanel extends javax.swing.JPanel {
         e.printStackTrace();
     }
 }
+private void populateChart() {
+    // 1. Create the Dataset
+    DefaultPieDataset dataset = new DefaultPieDataset();
+    
+    try {
+        model.analytics.Analytics analytics = new model.analytics.Analytics(enterprise);
+        Map<IssueType, Integer> typeMap = analytics.getRequestsByIssueType();
 
+        // Populate dataset
+        for (IssueType type : typeMap.keySet()) {
+            int count = typeMap.get(type);
+            if (count > 0) {
+                dataset.setValue(type.getValue(), count);
+            }
+        }
+        
+        // 2. Create the Chart
+        JFreeChart chart = ChartFactory.createPieChart(
+            "Issue Type Distribution",  // Chart Title
+            dataset,                    // Dataset
+            true,                       // Include Legend
+            true,
+            false
+        );
+
+        // 3. Customize Styling
+        PiePlot plot = (PiePlot) chart.getPlot();
+        plot.setBackgroundPaint(Color.white);
+        plot.setOutlineVisible(false);
+        
+        // 4. Add Chart to the UI Panel
+        ChartPanel chartPanel = new ChartPanel(chart);
+        
+        // FORCE Layout to BorderLayout to ensure it displays
+        pnlChart.setLayout(new java.awt.BorderLayout());
+        
+        pnlChart.removeAll(); 
+        pnlChart.add(chartPanel, BorderLayout.CENTER);
+        pnlChart.validate();
+        pnlChart.repaint();
+        
+    } catch (Exception e) {
+        System.out.println("Error creating chart: " + e.getMessage());
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -101,6 +155,7 @@ public class ManagerDashboardJPanel extends javax.swing.JPanel {
         btnGenerateReport = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
+        pnlChart = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -114,7 +169,7 @@ public class ManagerDashboardJPanel extends javax.swing.JPanel {
             .addGroup(topPanelLayout.createSequentialGroup()
                 .addGap(77, 77, 77)
                 .addComponent(lblTitle)
-                .addContainerGap(157, Short.MAX_VALUE))
+                .addContainerGap(295, Short.MAX_VALUE))
         );
         topPanelLayout.setVerticalGroup(
             topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -196,34 +251,42 @@ public class ManagerDashboardJPanel extends javax.swing.JPanel {
                 .addContainerGap(36, Short.MAX_VALUE))
         );
 
+        pnlChart.setPreferredSize(new java.awt.Dimension(400, 300));
+        pnlChart.setLayout(new java.awt.BorderLayout());
+
         javax.swing.GroupLayout centerPanelLayout = new javax.swing.GroupLayout(centerPanel);
         centerPanel.setLayout(centerPanelLayout);
         centerPanelLayout.setHorizontalGroup(
             centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(centerPanelLayout.createSequentialGroup()
-                .addGap(37, 37, 37)
-                .addGroup(centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTotalRequests)
-                    .addComponent(lblPendingRequests))
-                .addGroup(centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(centerPanelLayout.createSequentialGroup()
-                        .addGap(95, 95, 95)
-                        .addComponent(lblCompletionRate))
-                    .addGroup(centerPanelLayout.createSequentialGroup()
-                        .addGap(126, 126, 126)
-                        .addComponent(lblInProgress)))
-                .addGap(49, 49, 49)
-                .addGroup(centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(centerPanelLayout.createSequentialGroup()
-                        .addComponent(lblCompleted)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(centerPanelLayout.createSequentialGroup()
-                        .addComponent(lblAvgResolutionTime)
-                        .addGap(0, 30, Short.MAX_VALUE))))
-            .addGroup(centerPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(bottomPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(centerPanelLayout.createSequentialGroup()
+                .addGap(37, 37, 37)
+                .addGroup(centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(centerPanelLayout.createSequentialGroup()
+                        .addComponent(pnlChart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(centerPanelLayout.createSequentialGroup()
+                        .addGroup(centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblTotalRequests)
+                            .addComponent(lblPendingRequests))
+                        .addGroup(centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(centerPanelLayout.createSequentialGroup()
+                                .addGap(95, 95, 95)
+                                .addComponent(lblCompletionRate))
+                            .addGroup(centerPanelLayout.createSequentialGroup()
+                                .addGap(126, 126, 126)
+                                .addComponent(lblInProgress)))
+                        .addGap(49, 49, 49)
+                        .addGroup(centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(centerPanelLayout.createSequentialGroup()
+                                .addComponent(lblCompleted)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(centerPanelLayout.createSequentialGroup()
+                                .addComponent(lblAvgResolutionTime)
+                                .addGap(0, 167, Short.MAX_VALUE))))))
         );
         centerPanelLayout.setVerticalGroup(
             centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -238,7 +301,9 @@ public class ManagerDashboardJPanel extends javax.swing.JPanel {
                     .addComponent(lblPendingRequests)
                     .addComponent(lblInProgress)
                     .addComponent(lblCompleted))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(pnlChart, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(bottomPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -354,6 +419,7 @@ public class ManagerDashboardJPanel extends javax.swing.JPanel {
       
         
 loadAnalytics();
+populateChart();
     javax.swing.JOptionPane.showMessageDialog(this, 
         "Analytics refreshed!", 
         "Success", 
@@ -397,6 +463,7 @@ loadAnalytics();
     private javax.swing.JLabel lblPendingRequests;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblTotalRequests;
+    private javax.swing.JPanel pnlChart;
     private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 

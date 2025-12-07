@@ -6,6 +6,15 @@ package ui.manager;
 
 import java.awt.CardLayout;
 import javax.swing.table.DefaultTableModel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.data.general.DefaultPieDataset;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.util.Map;
+import util.enums.IssueType;
 
 /**
  *
@@ -25,7 +34,8 @@ private model.enterprise.Enterprise enterprise;
     this.ecoSystem = ecoSystem;
     this.enterprise = enterprise;
         initComponents();
-        populateAnalytics();
+        populateAnalytics(); 
+        populateChart();
     }
 private void populateAnalytics() {
      try {
@@ -87,6 +97,48 @@ private void populateAnalytics() {
         e.printStackTrace();
     }
 }
+private void populateChart() {
+    // 1. Create the Dataset
+    DefaultPieDataset dataset = new DefaultPieDataset();
+    
+    // Fetch data from your existing Analytics model
+    try {
+        model.analytics.Analytics analytics = new model.analytics.Analytics(enterprise);
+        Map<IssueType, Integer> typeMap = analytics.getRequestsByIssueType();
+
+        // Populate dataset
+        for (IssueType type : typeMap.keySet()) {
+            int count = typeMap.get(type);
+            if (count > 0) {
+                dataset.setValue(type.getValue(), count);
+            }
+        }
+        
+        // 2. Create the Chart
+        JFreeChart chart = ChartFactory.createPieChart(
+            "Requests by Issue Type",   // Chart Title
+            dataset,                    // Dataset
+            true,                       // Include Legend
+            true,
+            false
+        );
+
+        // 3. Optional: Customize Styling (Make it "Pop")
+        PiePlot plot = (PiePlot) chart.getPlot();
+        plot.setBackgroundPaint(Color.white);
+        plot.setOutlineVisible(false);
+        
+        // 4. Add Chart to the UI Panel (pnlChart)
+        ChartPanel chartPanel = new ChartPanel(chart);
+        pnlChart.removeAll(); // Clean up previous chart if refreshing
+        pnlChart.add(chartPanel, BorderLayout.CENTER);
+        pnlChart.validate();
+        pnlChart.repaint();
+        
+    } catch (Exception e) {
+        System.out.println("Error creating chart: " + e.getMessage());
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -105,6 +157,7 @@ private void populateAnalytics() {
         btnRefresh = new javax.swing.JButton();
         btnGenerateReport = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
+        pnlChart = new javax.swing.JPanel();
 
         lblTitle.setText("Enterprise Analytics - Detailed View");
 
@@ -157,26 +210,40 @@ private void populateAnalytics() {
             }
         });
 
+        javax.swing.GroupLayout pnlChartLayout = new javax.swing.GroupLayout(pnlChart);
+        pnlChart.setLayout(pnlChartLayout);
+        pnlChartLayout.setHorizontalGroup(
+            pnlChartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 297, Short.MAX_VALUE)
+        );
+        pnlChartLayout.setVerticalGroup(
+            pnlChartLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 233, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(185, Short.MAX_VALUE)
+                .addContainerGap(311, Short.MAX_VALUE)
                 .addComponent(lblTitle)
                 .addGap(199, 199, 199))
             .addGroup(layout.createSequentialGroup()
                 .addGap(39, 39, 39)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(btnRefresh)
-                            .addGap(44, 44, 44)
-                            .addComponent(btnGenerateReport)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnBack))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnRefresh)
+                                .addGap(44, 44, 44)
+                                .addComponent(btnGenerateReport)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnBack))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(pnlChart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -185,20 +252,23 @@ private void populateAnalytics() {
                 .addContainerGap()
                 .addComponent(lblTitle)
                 .addGap(32, 32, 32)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(68, 68, 68)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlChart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(37, 37, 37)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRefresh)
                     .addComponent(btnGenerateReport)
                     .addComponent(btnBack))
-                .addContainerGap(79, Short.MAX_VALUE))
+                .addContainerGap(121, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
 populateAnalytics();
+populateChart();
     javax.swing.JOptionPane.showMessageDialog(this,
             "Analytics refreshed!",
             "Success",
@@ -268,6 +338,7 @@ populateAnalytics();
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblTitle;
+    private javax.swing.JPanel pnlChart;
     private javax.swing.JTable tblStatusBreakdown;
     private javax.swing.JTextArea txtSummary;
     // End of variables declaration//GEN-END:variables
