@@ -11,12 +11,13 @@ import model.ecosystem.EcoSystem;
 import model.userAccount.UserAccount;
 import model.workQueue.WorkRequest;
 import util.enums.Status;
+import javax.swing.Timer;
 /**
  *
  * @author RIO
  */
 public class WorkerDashboardJPanel extends javax.swing.JPanel {
-   
+   private Timer notificationTimer;
 private javax.swing.table.DefaultTableModel tableModel;
     /**
      * Creates new form WorkerDashboardJPanel
@@ -33,6 +34,9 @@ private javax.swing.table.DefaultTableModel tableModel;
          setupTable();
     customizeUI();
     loadWorkRequests();
+    updateInboxBadge();
+    notificationTimer = new Timer(3000, e -> updateInboxBadge());
+    notificationTimer.start();
     }
 private void setupTable() {
     tableModel = (javax.swing.table.DefaultTableModel) tblWorkRequests.getModel();
@@ -93,6 +97,23 @@ public void loadWorkRequests() {
             "Error", 
             javax.swing.JOptionPane.ERROR_MESSAGE);
         e.printStackTrace();
+    }
+}
+public void updateInboxBadge() {
+    try {
+        int unreadCount = business.notification.NotificationService.getUnreadCount(userAccount); // Note: Use 'userAccount' or 'account' depending on the variable name in that file
+        
+        if (unreadCount > 0) {
+            btnInbox.setText("Inbox (" + unreadCount + ")");
+            btnInbox.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12)); // Make it bold
+            btnInbox.setForeground(java.awt.Color.RED); // Make it pop
+        } else {
+            btnInbox.setText("Inbox");
+            btnInbox.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+            btnInbox.setForeground(java.awt.Color.BLACK);
+        }
+    } catch (Exception e) {
+        System.out.println("Error updating badge: " + e.getMessage());
     }
 }
     /**
@@ -388,6 +409,7 @@ public void loadWorkRequests() {
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
    loadWorkRequests();
+   updateInboxBadge();
     javax.swing.JOptionPane.showMessageDialog(this, 
         "Refreshed!", 
         "Success", 
@@ -397,7 +419,11 @@ public void loadWorkRequests() {
     }//GEN-LAST:event_btnRefreshActionPerformed
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
-         int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
+        if (notificationTimer != null) {
+        notificationTimer.stop();
+    }
+        
+        int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
         "Are you sure you want to logout?",
         "Confirm Logout",
         javax.swing.JOptionPane.YES_NO_OPTION);

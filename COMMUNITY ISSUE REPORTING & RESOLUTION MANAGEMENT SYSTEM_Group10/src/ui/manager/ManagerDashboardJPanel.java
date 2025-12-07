@@ -12,6 +12,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.Map;
 import util.enums.IssueType;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 /**
  *
@@ -35,6 +39,7 @@ public class ManagerDashboardJPanel extends javax.swing.JPanel {
         initComponents();
         loadAnalytics();
         populateChart();
+        populateBarChart();
     }
     private void loadAnalytics() {
     if (enterprise == null) {
@@ -132,6 +137,53 @@ private void populateChart() {
         System.out.println("Error creating chart: " + e.getMessage());
     }
 }
+private void populateBarChart() {
+    // 1. Create Dataset
+    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+    
+    try {
+        model.analytics.Analytics analytics = new model.analytics.Analytics(enterprise);
+        Map<util.enums.Status, Integer> statusMap = analytics.getRequestsByStatus();
+
+        // Populate Data (Group by Status)
+        for (util.enums.Status status : statusMap.keySet()) {
+            dataset.addValue(statusMap.get(status), "Requests", status.getValue());
+        }
+        
+        // 2. Create Bar Chart
+        JFreeChart barChart = ChartFactory.createBarChart(
+            "Request Status Breakdown", // Chart Title
+            "Status",                   // Category Axis Label
+            "Number of Requests",       // Value Axis Label
+            dataset,                    // Dataset
+            PlotOrientation.VERTICAL,   // Orientation
+            false,                      // Include Legend (not needed for simple bars)
+            true,
+            false
+        );
+
+        // 3. Style the Chart
+        CategoryPlot plot = barChart.getCategoryPlot();
+        plot.setBackgroundPaint(Color.white);
+        plot.setRangeGridlinePaint(Color.lightGray);
+        
+        // Custom Colors for Bars
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        renderer.setSeriesPaint(0, new Color(79, 129, 189)); // Nice professional blue
+        renderer.setBarPainter(new org.jfree.chart.renderer.category.StandardBarPainter()); // Flat look
+        renderer.setDrawBarOutline(false);
+
+        // 4. Add to Panel
+        ChartPanel barPanel = new ChartPanel(barChart);
+        pnlBarChart.removeAll();
+        pnlBarChart.add(barPanel, BorderLayout.CENTER);
+        pnlBarChart.validate();
+        pnlBarChart.repaint();
+        
+    } catch (Exception e) {
+        System.out.println("Error creating bar chart: " + e.getMessage());
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -156,6 +208,7 @@ private void populateChart() {
         btnRefresh = new javax.swing.JButton();
         btnLogout = new javax.swing.JButton();
         pnlChart = new javax.swing.JPanel();
+        pnlBarChart = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -254,6 +307,8 @@ private void populateChart() {
         pnlChart.setPreferredSize(new java.awt.Dimension(400, 300));
         pnlChart.setLayout(new java.awt.BorderLayout());
 
+        pnlBarChart.setLayout(new java.awt.BorderLayout());
+
         javax.swing.GroupLayout centerPanelLayout = new javax.swing.GroupLayout(centerPanel);
         centerPanel.setLayout(centerPanelLayout);
         centerPanelLayout.setHorizontalGroup(
@@ -267,7 +322,9 @@ private void populateChart() {
                 .addGroup(centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(centerPanelLayout.createSequentialGroup()
                         .addComponent(pnlChart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(pnlBarChart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
                     .addGroup(centerPanelLayout.createSequentialGroup()
                         .addGroup(centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblTotalRequests)
@@ -301,8 +358,10 @@ private void populateChart() {
                     .addComponent(lblPendingRequests)
                     .addComponent(lblInProgress)
                     .addComponent(lblCompleted))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(pnlChart, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addGroup(centerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlChart, javax.swing.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(pnlBarChart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(bottomPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -420,6 +479,7 @@ private void populateChart() {
         
 loadAnalytics();
 populateChart();
+populateBarChart();
     javax.swing.JOptionPane.showMessageDialog(this, 
         "Analytics refreshed!", 
         "Success", 
@@ -463,6 +523,7 @@ populateChart();
     private javax.swing.JLabel lblPendingRequests;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JLabel lblTotalRequests;
+    private javax.swing.JPanel pnlBarChart;
     private javax.swing.JPanel pnlChart;
     private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables

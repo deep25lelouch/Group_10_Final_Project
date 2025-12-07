@@ -12,6 +12,7 @@ import model.organization.Organization;
 import model.userAccount.UserAccount;
 import model.workQueue.WorkRequest;
 import util.enums.Status;
+import javax.swing.Timer;
 /**
  *
  * @author RIO
@@ -26,7 +27,7 @@ private javax.swing.table.DefaultTableModel tableModel;
     private EcoSystem ecoSystem;
     private UserAccount userAccount;
     private Enterprise enterprise; // Changed from Organization to Enterprise
-    
+    private Timer notificationTimer;
 
     public SupervisorDashboardJPanel(JPanel userProcessContainer, EcoSystem ecoSystem, UserAccount account, Enterprise enterprise) {
         this.userProcessContainer = userProcessContainer;
@@ -38,6 +39,9 @@ private javax.swing.table.DefaultTableModel tableModel;
         setupTable();
         loadWorkers();
         loadUnassignedRequests();
+        updateInboxBadge();
+        notificationTimer = new Timer(3000, e -> updateInboxBadge());
+        notificationTimer.start();
     }
     
     
@@ -90,6 +94,24 @@ private void loadWorkers() {
             }
         }
     }
+    
+public void updateInboxBadge() {
+    try {
+        int unreadCount = business.notification.NotificationService.getUnreadCount(userAccount); // Note: Use 'userAccount' or 'account' depending on the variable name in that file
+        
+        if (unreadCount > 0) {
+            btnInbox.setText("Inbox (" + unreadCount + ")");
+            btnInbox.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12)); // Make it bold
+            btnInbox.setForeground(java.awt.Color.RED); // Make it pop
+        } else {
+            btnInbox.setText("Inbox");
+            btnInbox.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+            btnInbox.setForeground(java.awt.Color.BLACK);
+        }
+    } catch (Exception e) {
+        System.out.println("Error updating badge: " + e.getMessage());
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -258,6 +280,9 @@ private void loadWorkers() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+        if (notificationTimer != null) {
+        notificationTimer.stop();
+    }
         int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
             "Are you sure you want to logout?",
             "Confirm Logout",
@@ -283,6 +308,7 @@ private void loadWorkers() {
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
         loadUnassignedRequests();
         loadWorkers();
+        updateInboxBadge();
         javax.swing.JOptionPane.showMessageDialog(this,
             "Data refreshed!",
             "Success",

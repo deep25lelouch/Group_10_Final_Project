@@ -12,6 +12,13 @@ import model.ecosystem.EcoSystem;
 import model.userAccount.UserAccount;
 import model.workQueue.WorkRequest;
 import util.enums.Status;
+import org.openstreetmap.gui.jmapviewer.JMapViewer;
+import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
+import org.openstreetmap.gui.jmapviewer.interfaces.MapMarker;
+import java.awt.BorderLayout;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JDialog;
 /**
  *
  * @author RIO
@@ -325,7 +332,11 @@ public class WorkRequestDetailsJPanel extends javax.swing.JPanel {
 
                 targetOrg.getWorkQueue().addWorkRequest(crossRequest);
                 request.linkRequest(crossRequest);
-                
+                for(model.userAccount.UserAccount ua : targetOrg.getUserAccounts()){
+                    if(ua.getRole().toString().contains("Admin") || ua.getRole().toString().contains("Supervisor")){
+                        business.notification.NotificationService.notifyEscalation(ua, crossRequest);
+                    }
+                }
                 javax.swing.JOptionPane.showMessageDialog(this, 
                     "Success! Request routed to " + targetOrg.getName(),
                     "Routing Complete", 
@@ -345,16 +356,37 @@ public class WorkRequestDetailsJPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         if (request.getLocation() != null) {
         try {
-            // Generate Google Maps URL
+            // 1. Get Coordinates
             double lat = request.getLocation().getLatitude();
             double lon = request.getLocation().getLongitude();
-            String url = "https://www.google.com/maps/search/?api=1&query=" + lat + "," + lon;
             
-            // Open in default browser
-            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+            // 2. Create the Map Viewer
+            JMapViewer map = new JMapViewer();
+            
+            // 3. Create a Marker (Dot) at the location
+            // "Lat, Lon" and standard map settings
+            MapMarker marker = new MapMarkerDot(lat, lon);
+            map.addMapMarker(marker);
+            
+            // 4. Center the map on the location (Zoom level 15)
+            map.setDisplayPosition(new org.openstreetmap.gui.jmapviewer.Coordinate(lat, lon), 15);
+            
+            // 5. Create a Dialog to hold the map (Embedded Window)
+            JDialog mapDialog = new JDialog();
+            mapDialog.setTitle("Location: " + request.getLocation().getStreet());
+            mapDialog.setSize(800, 600);
+            mapDialog.setLocationRelativeTo(this); // Center on screen
+            mapDialog.setLayout(new BorderLayout());
+            
+            // 6. Add Map to Dialog
+            mapDialog.add(map, BorderLayout.CENTER);
+            
+            // 7. Show it
+            mapDialog.setVisible(true);
             
         } catch (Exception e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Error opening map: " + e.getMessage());
+            javax.swing.JOptionPane.showMessageDialog(this, "Error initializing map: " + e.getMessage());
+            e.printStackTrace();
         }
     } else {
         javax.swing.JOptionPane.showMessageDialog(this, "No location data available.");
