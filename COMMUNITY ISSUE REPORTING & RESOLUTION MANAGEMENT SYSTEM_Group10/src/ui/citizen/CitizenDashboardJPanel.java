@@ -29,20 +29,55 @@ private JPanel userProcessContainer;
 
     
    public CitizenDashboardJPanel(JPanel userProcessContainer, EcoSystem system, UserAccount account) {
-this.userProcessContainer = userProcessContainer;
+        this.userProcessContainer = userProcessContainer;
         this.system = system;
         this.account = account;
 
-    initComponents();
-    customizeUI();
-    
-     javax.swing.JPanel welcomePanel = new javax.swing.JPanel(new java.awt.BorderLayout());
-    welcomePanel.add(lblMainWelcome, java.awt.BorderLayout.CENTER);
-    workArea.add(welcomePanel, "Welcome");
-    
-    CardLayout layout = (CardLayout) workArea.getLayout();
-    layout.show(workArea, "Welcome");
-}
+        initComponents(); 
+        customizeUI();    
+        // === LAYOUT FIX ===
+        
+        this.removeAll();
+        this.setLayout(new java.awt.BorderLayout());
+
+        javax.swing.JPanel sidePanel = new javax.swing.JPanel();
+        sidePanel.setLayout(new javax.swing.BoxLayout(sidePanel, javax.swing.BoxLayout.Y_AXIS));
+        sidePanel.setPreferredSize(new java.awt.Dimension(250, 0)); 
+        sidePanel.setBackground(new java.awt.Color(240, 240, 240)); 
+        sidePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 20, 20, 20)); 
+
+        lblMainWelcome.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+        sidePanel.add(lblMainWelcome);
+        sidePanel.add(javax.swing.Box.createVerticalStrut(30)); 
+
+        
+        javax.swing.JButton[] buttons = {btnReportIssue, btnTrackIssues, btnMyProfile, btnInbox};
+        for (javax.swing.JButton btn : buttons) {
+            btn.setMaximumSize(new java.awt.Dimension(200, 40));
+            btn.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
+            sidePanel.add(btn);
+            sidePanel.add(javax.swing.Box.createVerticalStrut(15)); // Space between buttons
+        }
+
+        
+        sidePanel.add(javax.swing.Box.createVerticalGlue()); 
+        btnLogout.setMaximumSize(new java.awt.Dimension(200, 40));
+        sidePanel.add(btnLogout);
+
+        this.add(sidePanel, java.awt.BorderLayout.WEST);
+        this.add(workArea, java.awt.BorderLayout.CENTER);
+
+        javax.swing.JPanel welcomePanel = new javax.swing.JPanel(new java.awt.BorderLayout());
+        javax.swing.JLabel welcomeMsg = new javax.swing.JLabel("Welcome to the Citizen Portal", javax.swing.SwingConstants.CENTER);
+        welcomeMsg.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 24));
+        welcomePanel.add(welcomeMsg, java.awt.BorderLayout.CENTER);
+        
+        workArea.add(welcomePanel, "Welcome");
+        ((java.awt.CardLayout) workArea.getLayout()).show(workArea, "Welcome");
+
+        this.revalidate();
+        this.repaint();
+    }
    
    private void customizeUI() {
     if (account != null && account.getPerson() != null) {
@@ -210,7 +245,9 @@ this.userProcessContainer = userProcessContainer;
             
             CardLayout layout = (CardLayout) workArea.getLayout();
             layout.show(workArea, "ReportIssue");
-            
+            //UI issue solution by deep
+            workArea.revalidate(); // Recalculates the layout
+            workArea.repaint();    // Redraws the screen
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, 
                 "Error: " + e.getMessage(), 
