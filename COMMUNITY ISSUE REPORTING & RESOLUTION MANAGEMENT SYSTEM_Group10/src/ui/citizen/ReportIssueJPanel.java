@@ -85,7 +85,7 @@ private void loadDropdowns() {
 
         setAlignmentX(180.0F);
         setAlignmentY(180.0F);
-        setPreferredSize(new java.awt.Dimension(400, 100));
+        setPreferredSize(new java.awt.Dimension(1200, 800));
         setLayout(null);
 
         jLabel1.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N

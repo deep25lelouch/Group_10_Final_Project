@@ -55,6 +55,8 @@ public class TrackIssueJPanel extends javax.swing.JPanel {
     // Set table properties
     tblIssues.setRowHeight(25);
     tblIssues.getTableHeader().setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
+    //fix table size
+    tblIssues.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
 }
 
     private void loadIssues() {
