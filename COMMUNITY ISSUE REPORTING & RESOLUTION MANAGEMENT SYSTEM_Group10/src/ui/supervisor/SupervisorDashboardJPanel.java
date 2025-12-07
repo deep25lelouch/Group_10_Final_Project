@@ -3,7 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package ui.supervisor;
-
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.table.DefaultTableModel;
+import model.ecosystem.EcoSystem;
+import model.enterprise.Enterprise;
+import model.organization.Organization;
+import model.userAccount.UserAccount;
+import model.workQueue.WorkRequest;
+import util.enums.Status;
 /**
  *
  * @author RIO
@@ -14,95 +22,74 @@ private javax.swing.table.DefaultTableModel tableModel;
     /**
      * Creates new form SupervisorDashboardJPanel
      */
-   private javax.swing.JPanel userProcessContainer;
-    private model.ecosystem.EcoSystem ecoSystem;
-    private model.userAccount.UserAccount userAccount;
-    private model.organization.Organization organization;
+   private JPanel userProcessContainer;
+    private EcoSystem ecoSystem;
+    private UserAccount userAccount;
+    private Enterprise enterprise; // Changed from Organization to Enterprise
+    
 
-    public SupervisorDashboardJPanel(javax.swing.JPanel userProcessContainer, model.ecosystem.EcoSystem ecoSystem, model.userAccount.UserAccount account, model.organization.Organization org) {
+    public SupervisorDashboardJPanel(JPanel userProcessContainer, EcoSystem ecoSystem, UserAccount account, Enterprise enterprise) {
         this.userProcessContainer = userProcessContainer;
         this.ecoSystem = ecoSystem;
         this.userAccount = account;
-        this.organization = org;
-        initComponents();
+        this.enterprise = enterprise;
         
+        initComponents();
         setupTable();
-    loadWorkers();
-    loadUnassignedRequests();
+        loadWorkers();
+        loadUnassignedRequests();
     }
     
     
     private void setupTable() {
-    tableModel = (javax.swing.table.DefaultTableModel) jTable1.getModel();
-    jTable1.setRowHeight(25);
-    jTable1.getTableHeader().setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
-}
+        tableModel = (DefaultTableModel) jTable1.getModel();
+        jTable1.setRowHeight(25);
+        jTable1.getTableHeader().setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 12));
+    }
 
 private void loadWorkers() {
-    cmbWorkers.removeAllItems();
-    
-    if (organization == null) {
-        try {
-            organization = ecoSystem.getNetworks().get(0)
-                          .getEnterprises().get(0)
-                          .getOrganizations().get(0);
-        } catch (Exception e) {
-            return;
-        }
-    }
-    
-    for (model.userAccount.UserAccount account : organization.getUserAccounts()) {
-        if (!account.getRole().getRoleType().isAdmin()) {
-            cmbWorkers.addItem(account.getPerson().getFullName() + " - " + account.getRole().toString());
-        }
-    }
-}
+        cmbWorkers.removeAllItems();
+        
+        if (enterprise == null) return;
 
-private void loadUnassignedRequests() {
-    tableModel.setRowCount(0);
-    
-    if (organization == null) {
-        try {
-            organization = ecoSystem.getNetworks().get(0)
-                          .getEnterprises().get(0)
-                          .getOrganizations().get(0);
-        } catch (Exception e) {
-            return;
-        }
-    }
-    
-    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy");
-    
-    try {
-        for (model.workQueue.WorkRequest request : organization.getWorkQueue().getWorkRequests()) {
-            if (request.getStatus() == util.enums.Status.NEW || request.getReceiver() == null) {
-                
-                Object[] row = {
-                    request.getRequestId(),
-                    request.getIssueType() != null ? request.getIssueType().getValue() : "N/A",
-                    request.getPriority() != null ? request.getPriority().getValue() : "N/A",
-                    request.getLocation() != null ? request.getLocation().getStreet() : "N/A",
-                    request.getRequestDate() != null ? dateFormat.format(request.getRequestDate()) : "N/A"
-                };
-                tableModel.addRow(row);
+        for (Organization org : enterprise.getOrganizations()) {
+            for (UserAccount ua : org.getUserAccounts()) {
+                // Don't show the Supervisor himself, and don't show Admins
+                if (!ua.getRole().getRoleType().isAdmin() && 
+                    ua.getRole().getRoleType() != util.enums.RoleType.PUBLIC_WORKS_SUPERVISOR) {
+                    
+                    // Format: "Worker Name (Role) - Organization"
+                    String label = ua.getPerson().getFullName() + " (" + ua.getRole().toString() + ") - " + org.getName();
+                    cmbWorkers.addItem(label);
+                }
             }
         }
-        
-        if (tableModel.getRowCount() == 0) {
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                "No unassigned requests found!", 
-                "Info", 
-                javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        }
-        
-    } catch (Exception e) {
-        javax.swing.JOptionPane.showMessageDialog(this, 
-            "Error loading requests: " + e.getMessage(), 
-            "Error", 
-            javax.swing.JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
     }
-}
+
+    // FIX 2: Load requests from ALL Organizations
+    private void loadUnassignedRequests() {
+        tableModel.setRowCount(0);
+        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("MM/dd/yyyy");
+
+        if (enterprise == null) return;
+
+        for (Organization org : enterprise.getOrganizations()) {
+            for (WorkRequest request : org.getWorkQueue().getWorkRequests()) {
+                
+                // Show requests that are NEW or have no receiver
+                if (request.getStatus() == Status.NEW || request.getReceiver() == null) {
+                    Object[] row = {
+                        request.getRequestId(),
+                        request.getIssueType().getValue(),
+                        request.getPriority().getValue(),
+                        request.getLocation().getStreet(),
+                        dateFormat.format(request.getRequestDate())
+                    };
+                    tableModel.addRow(row);
+                }
+            }
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -112,46 +99,51 @@ private void loadUnassignedRequests() {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        topPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
         splitPane = new javax.swing.JSplitPane();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         rightPanel = new javax.swing.JPanel();
-        scrollPaneRequests = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        leftPanel = new javax.swing.JPanel();
         lblSelectWorker = new javax.swing.JLabel();
         cmbWorkers = new javax.swing.JComboBox<>();
+        btnLogout = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
         btnAssign = new javax.swing.JButton();
-        btnLogout = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        scrollPaneRequests = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        btnInbox = new javax.swing.JButton();
 
-        setLayout(new java.awt.BorderLayout());
+        splitPane.setDividerLocation(400);
+        splitPane.setLeftComponent(jLabel2);
+        splitPane.setRightComponent(jLabel3);
+
+        rightPanel.setPreferredSize(new java.awt.Dimension(400, 251));
+
+        lblSelectWorker.setText("Select Worker to Assign:");
+
+        btnLogout.setText("Log Out");
+        btnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogoutActionPerformed(evt);
+            }
+        });
+
+        btnRefresh.setText("Refresh");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
+        btnAssign.setText("Assign to Worker");
+        btnAssign.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAssignActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Arial", 1, 16)); // NOI18N
         jLabel1.setText("Supervisor Dashboard - Assign Work Requests");
-
-        javax.swing.GroupLayout topPanelLayout = new javax.swing.GroupLayout(topPanel);
-        topPanel.setLayout(topPanelLayout);
-        topPanelLayout.setHorizontalGroup(
-            topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(topPanelLayout.createSequentialGroup()
-                .addGap(87, 87, 87)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(382, Short.MAX_VALUE))
-        );
-        topPanelLayout.setVerticalGroup(
-            topPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(topPanelLayout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(jLabel1)
-                .addContainerGap(85, Short.MAX_VALUE))
-        );
-
-        add(topPanel, java.awt.BorderLayout.PAGE_START);
-
-        splitPane.setDividerLocation(400);
-
-        rightPanel.setPreferredSize(new java.awt.Dimension(400, 251));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -185,204 +177,217 @@ private void loadUnassignedRequests() {
         rightPanel.setLayout(rightPanelLayout);
         rightPanelLayout.setHorizontalGroup(
             rightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, rightPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(scrollPaneRequests, javax.swing.GroupLayout.PREFERRED_SIZE, 359, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addGroup(rightPanelLayout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addComponent(scrollPaneRequests, javax.swing.GroupLayout.PREFERRED_SIZE, 697, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(rightPanelLayout.createSequentialGroup()
+                .addGap(34, 34, 34)
+                .addGroup(rightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(rightPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 102, Short.MAX_VALUE))
+                    .addGroup(rightPanelLayout.createSequentialGroup()
+                        .addComponent(lblSelectWorker)
+                        .addGap(42, 42, 42)
+                        .addComponent(cmbWorkers, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(18, 18, 18)
+                .addComponent(btnAssign, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnRefresh)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnLogout)
+                .addGap(16, 16, 16))
         );
         rightPanelLayout.setVerticalGroup(
             rightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(rightPanelLayout.createSequentialGroup()
-                .addGap(51, 51, 51)
-                .addComponent(scrollPaneRequests, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, rightPanelLayout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addGroup(rightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblSelectWorker)
+                    .addComponent(cmbWorkers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAssign)
+                    .addComponent(btnLogout)
+                    .addComponent(btnRefresh))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
+                .addComponent(scrollPaneRequests, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        splitPane.setLeftComponent(rightPanel);
-
-        lblSelectWorker.setText("Select Worker to Assign:");
-
-        btnRefresh.setText("Refresh");
-        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+        btnInbox.setText("Inbox");
+        btnInbox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRefreshActionPerformed(evt);
+                btnInboxActionPerformed(evt);
             }
         });
 
-        btnAssign.setText("Assign to Worker");
-        btnAssign.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAssignActionPerformed(evt);
-            }
-        });
-
-        btnLogout.setText("Log Out");
-        btnLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnLogoutActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout leftPanelLayout = new javax.swing.GroupLayout(leftPanel);
-        leftPanel.setLayout(leftPanelLayout);
-        leftPanelLayout.setHorizontalGroup(
-            leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(leftPanelLayout.createSequentialGroup()
-                .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(leftPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(lblSelectWorker)
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
                         .addGap(18, 18, 18)
-                        .addComponent(cmbWorkers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(leftPanelLayout.createSequentialGroup()
-                        .addGap(25, 25, 25)
-                        .addComponent(btnAssign)
-                        .addGap(49, 49, 49)
-                        .addComponent(btnRefresh))
-                    .addGroup(leftPanelLayout.createSequentialGroup()
-                        .addGap(45, 45, 45)
-                        .addComponent(btnLogout)))
-                .addContainerGap(196, Short.MAX_VALUE))
+                        .addComponent(splitPane, javax.swing.GroupLayout.PREFERRED_SIZE, 870, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(rightPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 840, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 205, Short.MAX_VALUE)
+                        .addComponent(btnInbox)))
+                .addContainerGap())
         );
-        leftPanelLayout.setVerticalGroup(
-            leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(leftPanelLayout.createSequentialGroup()
-                .addGap(73, 73, 73)
-                .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblSelectWorker)
-                    .addComponent(cmbWorkers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnRefresh)
-                    .addComponent(btnAssign))
-                .addGap(18, 18, 18)
-                .addComponent(btnLogout)
-                .addContainerGap(91, Short.MAX_VALUE))
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap(28, Short.MAX_VALUE)
+                        .addComponent(rightPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 433, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btnInbox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addComponent(splitPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(154, 154, 154))
         );
-
-        splitPane.setRightComponent(leftPanel);
-
-        add(splitPane, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnAssignActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAssignActionPerformed
- int selectedRow = jTable1.getSelectedRow();
-    
-    if (selectedRow == -1) {
-        javax.swing.JOptionPane.showMessageDialog(this, 
-            "Please select a request to assign!", 
-            "No Selection", 
-            javax.swing.JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    
-    if (cmbWorkers.getSelectedItem() == null) {
-        javax.swing.JOptionPane.showMessageDialog(this, 
-            "Please select a worker!", 
-            "No Worker", 
-            javax.swing.JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    
-    try {
-        String requestId = (String) tableModel.getValueAt(selectedRow, 0);
-        
-        model.workQueue.WorkRequest request = null;
-        for (model.workQueue.WorkRequest req : organization.getWorkQueue().getWorkRequests()) {
-            if (req.getRequestId().equals(requestId)) {
-                request = req;
-                break;
-            }
-        }
-        
-        if (request == null) return;
-        
-        String selectedWorkerInfo = (String) cmbWorkers.getSelectedItem();
-        String workerName = selectedWorkerInfo.split(" - ")[0];
-        
-        model.userAccount.UserAccount selectedWorker = null;
-        for (model.userAccount.UserAccount acc : organization.getUserAccounts()) {
-            if (acc.getPerson().getFullName().equals(workerName)) {
-                selectedWorker = acc;
-                break;
-            }
-        }
-        
-        if (selectedWorker != null) {
-            request.setReceiver(selectedWorker);
-            request.setStatus(util.enums.Status.ASSIGNED);
-            selectedWorker.getWorkQueue().addWorkRequest(request);
-            
-            business.notification.NotificationService.notifyNewAssignment(selectedWorker, request);
-            
-            javax.swing.JOptionPane.showMessageDialog(this, 
-                "Request " + requestId + " assigned to " + workerName + "!\n" +
-                "Worker has been notified.", 
-                "Success", 
-                javax.swing.JOptionPane.INFORMATION_MESSAGE);
-            
-            loadUnassignedRequests();
-        }
-        
-    } catch (Exception e) {
-        javax.swing.JOptionPane.showMessageDialog(this, 
-            "Error assigning request: " + e.getMessage(), 
-            "Error", 
-            javax.swing.JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
-    }
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnAssignActionPerformed
-
-    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-    loadUnassignedRequests();
-    loadWorkers();
-    javax.swing.JOptionPane.showMessageDialog(this, 
-        "Data refreshed!", 
-        "Success", 
-        javax.swing.JOptionPane.INFORMATION_MESSAGE);
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnRefreshActionPerformed
-
     private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
- int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
-        "Are you sure you want to logout?",
-        "Confirm Logout",
-        javax.swing.JOptionPane.YES_NO_OPTION);
-    
-    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-        // Go back to login screen
-        userProcessContainer.removeAll();
-        
-        ui.login.LoginJPanel loginPanel = new ui.login.LoginJPanel(userProcessContainer, ecoSystem);
-        userProcessContainer.add(loginPanel, "Login");
-        
-        java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
-        layout.show(userProcessContainer, "Login");
-        
-        userProcessContainer.revalidate();
-        userProcessContainer.repaint();
-    }
+        int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to logout?",
+            "Confirm Logout",
+            javax.swing.JOptionPane.YES_NO_OPTION);
+
+        if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+            // Go back to login screen
+            userProcessContainer.removeAll();
+
+            ui.login.LoginJPanel loginPanel = new ui.login.LoginJPanel(userProcessContainer, ecoSystem);
+            userProcessContainer.add(loginPanel, "Login");
+
+            java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+            layout.show(userProcessContainer, "Login");
+
+            userProcessContainer.revalidate();
+            userProcessContainer.repaint();
+        }
 
         // TODO add your handling code here:
     }//GEN-LAST:event_btnLogoutActionPerformed
 
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        loadUnassignedRequests();
+        loadWorkers();
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Data refreshed!",
+            "Success",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnAssignActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAssignActionPerformed
+        int selectedRow = jTable1.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a request!", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (cmbWorkers.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Please select a worker!", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            String requestId = (String) tableModel.getValueAt(selectedRow, 0);
+
+            // 1. Find the Request (Search all orgs)
+            WorkRequest request = null;
+            Organization requestOrg = null;
+
+            outerLoop:
+            for (Organization org : enterprise.getOrganizations()) {
+                for (WorkRequest req : org.getWorkQueue().getWorkRequests()) {
+                    if (req.getRequestId().equals(requestId)) {
+                        request = req;
+                        requestOrg = org;
+                        break outerLoop;
+                    }
+                }
+            }
+
+            if (request == null) return;
+
+            // 2. Find the Worker (Parse from Dropdown)
+            String selection = (String) cmbWorkers.getSelectedItem();
+            // Selection format: "Name (Role) - OrgName"
+            // We need to match Name and Role carefully, or just search by Name if unique
+            // Let's search by Full Name match
+            String workerName = selection.substring(0, selection.indexOf(" ("));
+
+            UserAccount selectedWorker = null;
+
+            workerLoop:
+            for (Organization org : enterprise.getOrganizations()) {
+                for (UserAccount ua : org.getUserAccounts()) {
+                    if (ua.getPerson().getFullName().equals(workerName)) {
+                        selectedWorker = ua;
+                        break workerLoop;
+                    }
+                }
+            }
+
+            if (selectedWorker != null) {
+                // 3. Assign
+                request.setReceiver(selectedWorker);
+                request.setStatus(Status.ASSIGNED);
+                selectedWorker.getWorkQueue().addWorkRequest(request);
+
+                business.notification.NotificationService.notifyNewAssignment(selectedWorker, request);
+
+                JOptionPane.showMessageDialog(this,
+                    "Assigned Request " + requestId + " to " + selectedWorker.getUsername());
+
+                loadUnassignedRequests(); // Refresh table
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error assigning: " + e.getMessage());
+        }
+
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnAssignActionPerformed
+
+    private void btnInboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInboxActionPerformed
+        // TODO add your handling code here:
+        ui.common.ViewNotificationsJPanel inboxPanel = new ui.common.ViewNotificationsJPanel(userProcessContainer, userAccount);
+    userProcessContainer.add("Inbox", inboxPanel);
+    java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+    layout.next(userProcessContainer);
+    }//GEN-LAST:event_btnInboxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAssign;
+    private javax.swing.JButton btnInbox;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JComboBox<String> cmbWorkers;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JTable jTable1;
     private javax.swing.JLabel lblSelectWorker;
-    private javax.swing.JPanel leftPanel;
     private javax.swing.JPanel rightPanel;
     private javax.swing.JScrollPane scrollPaneRequests;
     private javax.swing.JSplitPane splitPane;
-    private javax.swing.JPanel topPanel;
     // End of variables declaration//GEN-END:variables
 
 

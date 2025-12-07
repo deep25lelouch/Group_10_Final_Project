@@ -1,6 +1,7 @@
 package util.enums;
 
 //Rijurik_Saha_002525961
+
 public enum RoleType {
 
     // Operational Roles
@@ -11,7 +12,14 @@ public enum RoleType {
     ELECTRICIAN("Electrician"),
     WASTE_WORKER("Waste Worker"),
     HEALTH_INSPECTOR("Health Inspector"),
+    
+    // Supervisors (The Dispatchers)
     PUBLIC_WORKS_SUPERVISOR("Public Works Supervisor"),
+    UTILITIES_SUPERVISOR("Utilities Supervisor"),           // <--- NEW
+    PUBLIC_SAFETY_SUPERVISOR("Public Safety Supervisor"),   // <--- NEW
+    EMERGENCY_SUPERVISOR("Emergency Supervisor"),           // <--- NEW
+
+    // Managers/Coordinators (High Level)
     UTILITIES_MANAGER("Utilities Manager"),
     EMERGENCY_COORDINATOR("Emergency Coordinator"),
 
@@ -35,6 +43,8 @@ public enum RoleType {
     EMERGENCY_RESPONSE_ADMIN("Emergency Response Admin"),
     SAFETY_COORDINATION_ADMIN("Safety Coordination Admin");
 
+    
+
     private final String value;
 
     RoleType(String value) {
@@ -46,19 +56,6 @@ public enum RoleType {
     }
 
     public boolean isAdmin() {
-        return this == SYSTEM_ADMIN ||
-               this == NETWORK_ADMIN ||
-               this == PUBLIC_WORKS_ENTERPRISE_ADMIN ||
-               this == UTILITIES_ENTERPRISE_ADMIN ||
-               this == SAFETY_ENVIRONMENT_ENTERPRISE_ADMIN ||
-               this == EMERGENCY_MANAGEMENT_ENTERPRISE_ADMIN ||
-               this == ROAD_MAINTENANCE_ADMIN ||
-               this == STREET_LIGHTING_ADMIN ||
-               this == WATER_SERVICES_ADMIN ||
-               this == ELECTRICAL_SERVICES_ADMIN ||
-               this == WASTE_MANAGEMENT_ADMIN ||
-               this == ENVIRONMENTAL_HEALTH_ADMIN ||
-               this == EMERGENCY_RESPONSE_ADMIN ||
-               this == SAFETY_COORDINATION_ADMIN;
+        return this.name().endsWith("_ADMIN");
     }
 }

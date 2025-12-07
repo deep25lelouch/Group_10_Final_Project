@@ -35,7 +35,7 @@ public ReportIssueJPanel(javax.swing.JPanel workArea,
         this.ecoSystem = ecoSystem;
         this.userAccount = account;
     
-    initComponents(); 
+    initComponents(); // This line is already there
     
     loadDropdowns();
 }
@@ -52,7 +52,9 @@ private void loadDropdowns() {
         cmbPriority.setSelectedItem("Medium");
 }
 
-
+//    public ReportIssueJPanel() {
+//        initComponents();
+//    }
 
     /**
      * This method is called from within the constructor to initialize the form.

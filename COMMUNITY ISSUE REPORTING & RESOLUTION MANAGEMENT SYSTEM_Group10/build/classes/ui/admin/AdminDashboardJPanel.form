@@ -34,16 +34,20 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Component id="btnManageNetworks" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnManageEnterprise" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnManageOrganization" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnManageUsers" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnManageOrganization" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="btnManageUsers" alignment="0" min="-2" pref="131" max="-2" attributes="0"/>
+                                  <Component id="btnManageEnterprise" alignment="0" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
                               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnLogout" min="-2" pref="131" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
@@ -63,7 +67,9 @@
                       <Component id="btnManageOrganization" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="60" max="-2" attributes="0"/>
                       <Component id="btnManageUsers" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="183" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
+                      <Component id="btnLogout" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="129" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -108,6 +114,14 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="Admin Dashboard"/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="btnLogout">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Log Out"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnLogoutActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

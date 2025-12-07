@@ -32,63 +32,62 @@ public class DataGenerator {
     private static Random random = new Random();
 
     public static void populateEcoSystem(EcoSystem ecoSystem) {
-        // Create Network
-        Network network = ecoSystem.createAndAddNetwork("Boston Services Network");
+    // 1. Create Network
+    Network network = ecoSystem.createAndAddNetwork("Boston Services Network");
 
-        // Create Enterprises
-        Enterprise publicWorks = network.createAndAddEnterprise("Public Works Department",
-                Enterprise.EnterpriseType.PUBLIC_WORKS);
-        Enterprise utilities = network.createAndAddEnterprise("Boston Utilities",
-                Enterprise.EnterpriseType.UTILITIES);
-        Enterprise publicSafety = network.createAndAddEnterprise("Public Safety & Environment",
-                Enterprise.EnterpriseType.PUBLIC_SAFETY_ENVIRONMENT);
-        Enterprise emergency = network.createAndAddEnterprise("Emergency Management",
-                Enterprise.EnterpriseType.EMERGENCY_MANAGEMENT);
+    // 2. Create Enterprises
+    Enterprise publicWorks = network.createAndAddEnterprise("Public Works", Enterprise.EnterpriseType.PUBLIC_WORKS);
+    Enterprise utilities = network.createAndAddEnterprise("Boston Utilities", Enterprise.EnterpriseType.UTILITIES);
+    Enterprise publicSafety = network.createAndAddEnterprise("Public Safety & Environment", Enterprise.EnterpriseType.PUBLIC_SAFETY_ENVIRONMENT);
+    Enterprise emergency = network.createAndAddEnterprise("Emergency Management", Enterprise.EnterpriseType.EMERGENCY_MANAGEMENT);
+    
+    // NEW: The Home for Citizens
+    Enterprise residentEnt = network.createAndAddEnterprise("Resident Services", Enterprise.EnterpriseType.RESIDENT_SERVICES);
 
-        // Create Organizations
-        Organization roadMaintenance = publicWorks.createAndAddOrganization("Road Maintenance",
-                Organization.OrganizationType.ROAD_MAINTENANCE);
-        Organization streetLighting = publicWorks.createAndAddOrganization("Street Lighting",
-                Organization.OrganizationType.STREET_LIGHTING);
-        Organization waterServices = utilities.createAndAddOrganization("Water Services",
-                Organization.OrganizationType.WATER_SERVICES);
-        Organization electricalServices = utilities.createAndAddOrganization("Electrical Services",
-                Organization.OrganizationType.ELECTRICAL_SERVICES);
-        Organization wasteMgmt = publicSafety.createAndAddOrganization("Waste Management",
-                Organization.OrganizationType.WASTE_MANAGEMENT);
-        Organization envHealth = publicSafety.createAndAddOrganization("Environmental Health",
-                Organization.OrganizationType.ENVIRONMENTAL_HEALTH);
-        Organization emergencyResponse = emergency.createAndAddOrganization("Emergency Response",
-                Organization.OrganizationType.EMERGENCY_RESPONSE);
-        Organization safetyCoord = emergency.createAndAddOrganization("Safety Coordination",
-                Organization.OrganizationType.SAFETY_COORDINATION);
+    // 3. Create Organizations
+    Organization roadMaintenance = publicWorks.createAndAddOrganization("Road Maintenance", Organization.OrganizationType.ROAD_MAINTENANCE);
+    Organization streetLighting = publicWorks.createAndAddOrganization("Street Lighting", Organization.OrganizationType.STREET_LIGHTING);
+    Organization waterServices = utilities.createAndAddOrganization("Water Services", Organization.OrganizationType.WATER_SERVICES);
+    Organization electricalServices = utilities.createAndAddOrganization("Electrical Services", Organization.OrganizationType.ELECTRICAL_SERVICES);
+    Organization wasteMgmt = publicSafety.createAndAddOrganization("Waste Management", Organization.OrganizationType.WASTE_MANAGEMENT);
+    Organization envHealth = publicSafety.createAndAddOrganization("Environmental Health", Organization.OrganizationType.ENVIRONMENTAL_HEALTH);
+    Organization emergencyResponse = emergency.createAndAddOrganization("Emergency Response", Organization.OrganizationType.EMERGENCY_RESPONSE);
+    Organization safetyCoord = emergency.createAndAddOrganization("Safety Coordination", Organization.OrganizationType.SAFETY_COORDINATION);
+    
+    // NEW: The Organization for Citizens
+    Organization residentOrg = residentEnt.createAndAddOrganization("Residents Association", Organization.OrganizationType.SAFETY_COORDINATION); // Using Safety Coord type as placeholder or add a new CITIZEN type if preferred
 
-        // Generate Users for each Organization
-        generateUsersForOrganization(roadMaintenance, new RoadTechnicianRole(), 5);
-        generateUsersForOrganization(streetLighting, new StreetLightingTechnicianRole(), 4);
-        generateUsersForOrganization(waterServices, new PlumberRole(), 5);
-        generateUsersForOrganization(electricalServices, new ElectricianRole(), 4);
-        generateUsersForOrganization(wasteMgmt, new WasteWorkerRole(), 6);
-        generateUsersForOrganization(envHealth, new HealthInspectorRole(), 3);
+    // 4. Generate Users for each Organization (Workers)
+    generateUsersForOrganization(roadMaintenance, new RoadTechnicianRole(), 5);
+    generateUsersForOrganization(streetLighting, new StreetLightingTechnicianRole(), 4);
+    generateUsersForOrganization(waterServices, new PlumberRole(), 5);
+    generateUsersForOrganization(electricalServices, new ElectricianRole(), 4);
+    generateUsersForOrganization(wasteMgmt, new WasteWorkerRole(), 6);
+    generateUsersForOrganization(envHealth, new HealthInspectorRole(), 3);
 
-        // Generate Supervisors and Managers
-        generateSupervisor(publicWorks);
-        generateManager(utilities);
-        generateEmergencyCoordinator(emergency);
+    // 5. Generate Supervisors and Managers
+    generateSupervisor(publicWorks);
+    generateSupervisor(utilities);
+    generateSupervisor(publicSafety);
+    generateSupervisor(emergency);
+    generateManager(utilities);
+    generateEmergencyCoordinator(emergency);
 
-        // Generate Citizens
-        generateCitizens(50);
+    // 6. Generate Citizens (Now in the correct Organization!)
+    generateUsersForOrganization(residentOrg, new CitizenRole(), 10);
 
-        // Generate Sample Work Requests
-        generateWorkRequests(roadMaintenance, 15);
-        generateWorkRequests(waterServices, 10);
-        generateWorkRequests(electricalServices, 8);
+    // 7. Generate Sample Work Requests
+    generateWorkRequests(roadMaintenance, 15);
+    generateWorkRequests(waterServices, 10);
+    generateWorkRequests(electricalServices, 8);
 
-        // Create Admin Users
-        createAdminUsers(network);
-        // Print all generated users with their credentials
-        printGeneratedUsers(network);
-    }
+    // 8. Create Admin Users (THE MISSING PIECE)
+    createCorrectAdminUsers(network, publicWorks, roadMaintenance);
+    
+    // Print logic
+    printGeneratedUsers(network);
+}
+    
 
     private static void generateUsersForOrganization(Organization org, Role role, int count) {
         for (int i = 0; i < count; i++) {
@@ -221,6 +220,31 @@ public class DataGenerator {
                         + ". Requires immediate attention.";
         }
     }
+    private static void generateCitizenAccounts(EcoSystem ecoSystem, int count) {
+    // Get first organization to store citizen accounts
+    Organization org = ecoSystem.getNetworks().get(0)
+                      .getEnterprises().get(0)
+                      .getOrganizations().get(0);
+    
+    for (int i = 0; i < count; i++) {
+        Person citizen = org.getPersonDirectory().createAndAddPerson(
+            faker.name().firstName(),
+            faker.name().lastName(),
+            faker.internet().emailAddress(),
+            faker.phoneNumber().cellPhone()
+        );
+        citizen.setAddress(faker.address().streetAddress());
+        
+        UserAccount account = new UserAccount();
+        account.setUsername("citizen" + (i + 1));
+        account.setPassword("Password123!");
+        account.setPerson(citizen);
+        account.setRole(new model.role.CitizenRole());
+        
+        org.getUserAccounts().add(account);
+        ecoSystem.addUserAccount(account); // If this method exists
+    }
+}
 
     private static Location generateRandomLocation() {
         Location location = new Location();
@@ -256,7 +280,42 @@ public class DataGenerator {
         netAdminAccount.setRole(new NetworkAdminRole());
         org.getUserAccounts().add(netAdminAccount);
     }
+    private static void createCorrectAdminUsers(Network network, Enterprise sampleEnterprise, Organization sampleOrg) {
+    // A. System Admin (Global) - We place him in the first org just for storage, but his Role gives him global access
+    Organization storageOrg = network.getEnterprises().get(0).getOrganizations().get(0);
+    
+    UserAccount sysAdmin = new UserAccount();
+    sysAdmin.setUsername("sysadmin");
+    sysAdmin.setPassword("Admin123!");
+    sysAdmin.setRole(new SystemAdminRole());
+    sysAdmin.setPerson(new Person("System", "Admin", "sys@sys.com", "000"));
+    storageOrg.getUserAccounts().add(sysAdmin);
 
+    // B. Network Admin (Manages Boston)
+    UserAccount netAdmin = new UserAccount();
+    netAdmin.setUsername("netadmin");
+    netAdmin.setPassword("Admin123!");
+    netAdmin.setRole(new NetworkAdminRole());
+    netAdmin.setPerson(new Person("Network", "Admin", "net@sys.com", "000"));
+    storageOrg.getUserAccounts().add(netAdmin);
+
+    // C. Enterprise Admin (Manages Public Works) - Stored inside Public Works
+    Organization pwStorage = sampleEnterprise.getOrganizations().get(0);
+    UserAccount entAdmin = new UserAccount();
+    entAdmin.setUsername("admin.publicworks");
+    entAdmin.setPassword("Admin123!");
+    entAdmin.setRole(new PublicWorksEnterpriseAdminRole());
+    entAdmin.setPerson(new Person("PW", "Admin", "pw@sys.com", "000"));
+    pwStorage.getUserAccounts().add(entAdmin);
+
+    // D. Organization Admin (Manages Road Maintenance) - Stored inside Road Maintenance
+    UserAccount orgAdmin = new UserAccount();
+    orgAdmin.setUsername("admin.road");
+    orgAdmin.setPassword("Admin123!");
+    orgAdmin.setRole(new RoadMaintenanceAdminRole());
+    orgAdmin.setPerson(new Person("Road", "Admin", "road@sys.com", "000"));
+    sampleOrg.getUserAccounts().add(orgAdmin);
+}
     private static void printAllCredentials() {
         System.out.println("\n========================================");
         System.out.println("GENERATED USER CREDENTIALS FOR TESTING");

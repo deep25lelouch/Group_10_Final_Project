@@ -3,7 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package ui.worker;
-
+import java.awt.CardLayout;
+import java.awt.Component;
+import java.util.Date;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import model.ecosystem.EcoSystem;
+import model.userAccount.UserAccount;
+import model.workQueue.WorkRequest;
+import util.enums.Status;
 /**
  *
  * @author RIO
@@ -26,30 +34,339 @@ public class WorkRequestDetailsJPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        lblTitle = new javax.swing.JLabel();
+        lblRequestId = new javax.swing.JLabel();
+        lblStatus = new javax.swing.JLabel();
+        lblPriority = new javax.swing.JLabel();
+        lblCitizen = new javax.swing.JLabel();
+        lblDate = new javax.swing.JLabel();
+        txtAddress = new javax.swing.JTextField();
+        txtLocation = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtDescription = new javax.swing.JTextArea();
+        lblDescription = new javax.swing.JLabel();
+        btnBack = new javax.swing.JButton();
+        btnComplete = new javax.swing.JButton();
+        btnAddNote = new javax.swing.JButton();
+        btnEscalate = new javax.swing.JButton();
+        lblLinked = new javax.swing.JLabel();
+
+        lblTitle.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTitle.setText("Work Request Details:");
+
+        lblRequestId.setText("Request ID:");
+
+        lblStatus.setText("Status:");
+
+        lblPriority.setText("Priority:");
+
+        lblCitizen.setText("Reported By:");
+
+        lblDate.setText("Date:");
+
+        txtAddress.setEditable(false);
+
+        txtLocation.setText("Location:");
+
+        txtDescription.setEditable(false);
+        txtDescription.setColumns(20);
+        txtDescription.setRows(5);
+        jScrollPane1.setViewportView(txtDescription);
+
+        lblDescription.setText("Description:");
+
+        btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+
+        btnComplete.setText("Complete");
+        btnComplete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCompleteActionPerformed(evt);
+            }
+        });
+
+        btnAddNote.setText("Add Note");
+        btnAddNote.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddNoteActionPerformed(evt);
+            }
+        });
+
+        btnEscalate.setText("Escalate/Report Related");
+        btnEscalate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEscalateActionPerformed(evt);
+            }
+        });
+
+        lblLinked.setText("linked request:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblDate)
+                            .addComponent(lblCitizen)
+                            .addComponent(lblPriority)
+                            .addComponent(lblStatus)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRequestId)
+                                .addGap(126, 126, 126)
+                                .addComponent(lblLinked))
+                            .addComponent(lblTitle))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtLocation)
+                                    .addComponent(lblDescription))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jScrollPane1)
+                                    .addComponent(txtAddress)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(btnBack)
+                                .addGap(119, 119, 119)
+                                .addComponent(btnComplete)
+                                .addGap(104, 104, 104)
+                                .addComponent(btnEscalate)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
+                                .addComponent(btnAddNote)))
+                        .addGap(68, 68, 68))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(14, 14, 14)
+                .addComponent(lblTitle)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblRequestId)
+                    .addComponent(lblLinked))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblStatus)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblPriority)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblCitizen)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblDate)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtLocation))
+                .addGap(30, 30, 30)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblDescription)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnBack)
+                    .addComponent(btnAddNote)
+                    .addComponent(btnEscalate)
+                    .addComponent(btnComplete))
+                .addGap(35, 35, 35))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        // TODO add your handling code here:
+        userProcessContainer.remove(this);
+    
+    // Refresh the previous panel (Worker Dashboard) so the table updates!
+    java.awt.Component[] components = userProcessContainer.getComponents();
+    for (java.awt.Component component : components) {
+        if (component instanceof WorkerDashboardJPanel) {
+            ((WorkerDashboardJPanel) component).loadWorkRequests(); 
+        }
+    }
+    
+    java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+    layout.previous(userProcessContainer);
+    }//GEN-LAST:event_btnBackActionPerformed
+
+    private void btnCompleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCompleteActionPerformed
+        // TODO add your handling code here:
+        int confirm = javax.swing.JOptionPane.showConfirmDialog(this, 
+        "Mark request as Completed?", "Confirm", javax.swing.JOptionPane.YES_NO_OPTION);
+        
+    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+        request.setStatus(util.enums.Status.COMPLETED);
+        request.setResolveDate(new java.util.Date());
+        
+        // Optional: Notify Citizen
+        if(request.getSender() != null) {
+            business.notification.NotificationService.notifyCompletion(request.getSender(), request);
+        }
+        
+        javax.swing.JOptionPane.showMessageDialog(this, "Request marked as Completed!");
+        populateData(); // Refresh UI to disable the button
+    }
+    }//GEN-LAST:event_btnCompleteActionPerformed
+
+    private void btnAddNoteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddNoteActionPerformed
+        // TODO add your handling code here:
+        String note = javax.swing.JOptionPane.showInputDialog(this, "Enter Note:");
+    if (note != null && !note.trim().isEmpty()) {
+        request.addNote(note, userAccount);
+        javax.swing.JOptionPane.showMessageDialog(this, "Note added successfully.");
+    }
+    }//GEN-LAST:event_btnAddNoteActionPerformed
+
+    private void btnEscalateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEscalateActionPerformed
+        // TODO add your handling code here:
+        // 1. Ask the worker what the related issue is
+        util.enums.IssueType[] options = util.enums.IssueType.values();
+        util.enums.IssueType selectedType = (util.enums.IssueType) javax.swing.JOptionPane.showInputDialog(
+                this,
+                "Select the related issue type (e.g., Road Damage):",
+                "Cross-Department Escalation",
+                javax.swing.JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+
+        if (selectedType != null) {
+            try {
+                // 2. Create the linked request
+                model.workQueue.WorkRequest crossRequest = new model.workQueue.WorkRequest();
+                crossRequest.setIssueType(selectedType);
+                crossRequest.setPriority(util.enums.Priority.HIGH); // Escalations are usually high priority
+                crossRequest.setStatus(util.enums.Status.NEW);
+                
+                // Link description to original
+                crossRequest.setDescription("ESCALATED via Request " + request.getRequestId() + 
+                                          " by " + userAccount.getUsername() + ": " + 
+                                          request.getDescription());
+                
+                // Copy location (same physical spot)
+                crossRequest.setLocation(request.getLocation());
+                crossRequest.setCitizenId(request.getCitizenId()); // Keep original citizen linked
+                crossRequest.setSender(userAccount); // The WORKER is the sender of this internal request
+
+                // 3. ROUTING MAGIC: Find the target Enterprise/Org
+                // We assume we are in the first network for this demo
+                model.network.Network network = ecoSystem.getNetworks().get(0);
+                
+                model.enterprise.Enterprise targetEnt = business.routing.WorkRequestRouter.routeToEnterprise(crossRequest, network);
+                
+                if (targetEnt != null) {
+                    model.organization.Organization targetOrg = business.routing.WorkRequestRouter.routeToOrganization(crossRequest, targetEnt);
+                    
+                    if (targetOrg != null) {
+                        // 4. Send it!
+                        targetOrg.getWorkQueue().addWorkRequest(crossRequest);
+                        
+                        // 5. Link it in the model (Two-way link)
+                        request.linkRequest(crossRequest);
+                        
+                        // Notify
+                        javax.swing.JOptionPane.showMessageDialog(this, 
+                            "Success! Linked Request " + crossRequest.getRequestId() + 
+                            "\nhas been sent to: " + targetEnt.getName() + " / " + targetOrg.getName(),
+                            "Cross-Enterprise Collaboration", 
+                            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                            
+                    } else {
+                        javax.swing.JOptionPane.showMessageDialog(this, "Could not find an Organization to handle " + selectedType.getValue());
+                    }
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Could not find an Enterprise to handle " + selectedType.getValue());
+                }
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                javax.swing.JOptionPane.showMessageDialog(this, "Error escalating: " + e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btnEscalateActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAddNote;
+    private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnComplete;
+    private javax.swing.JButton btnEscalate;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblCitizen;
+    private javax.swing.JLabel lblDate;
+    private javax.swing.JLabel lblDescription;
+    private javax.swing.JLabel lblLinked;
+    private javax.swing.JLabel lblPriority;
+    private javax.swing.JLabel lblRequestId;
+    private javax.swing.JLabel lblStatus;
+    private javax.swing.JLabel lblTitle;
+    private javax.swing.JTextField txtAddress;
+    private javax.swing.JTextArea txtDescription;
+    private javax.swing.JLabel txtLocation;
     // End of variables declaration//GEN-END:variables
 private javax.swing.JPanel userProcessContainer;
     private model.ecosystem.EcoSystem ecoSystem;
-    private model.workQueue.WorkRequest workRequest;
+    private model.userAccount.UserAccount userAccount;
+    private model.workQueue.WorkRequest request;
 
-    public WorkRequestDetailsJPanel(javax.swing.JPanel userProcessContainer, model.ecosystem.EcoSystem ecoSystem, model.workQueue.WorkRequest request) {
+// 2. Replace the Default Constructor with this Parameterized Constructor:
+    public WorkRequestDetailsJPanel(javax.swing.JPanel userProcessContainer, model.ecosystem.EcoSystem ecoSystem, model.userAccount.UserAccount account, model.workQueue.WorkRequest request) {
+        initComponents(); // Keep this! NetBeans needs it.
+        
         this.userProcessContainer = userProcessContainer;
         this.ecoSystem = ecoSystem;
-        this.workRequest = request;
-        initComponents();
+        this.userAccount = account;
+        this.request = request;
+        
+        populateData();
+    }
+private void populateData() {
+        if (request == null) return;
+
+        lblRequestId.setText(request.getRequestId());
+        lblStatus.setText(request.getStatus().getValue());
+        lblPriority.setText(request.getPriority().getValue());
+        lblDate.setText(request.getRequestDate().toString());
+        
+        // Null check for sender
+        if (request.getSender() != null && request.getSender().getPerson() != null) {
+            lblCitizen.setText(request.getSender().getPerson().getFullName());
+        } else {
+            lblCitizen.setText("Anonymous/Unknown");
+        }
+        
+        // Null check for location
+        if (request.getLocation() != null) {
+            txtAddress.setText(request.getLocation().toString());
+        }
+        
+        txtDescription.setText(request.getDescription());
+        
+        // Disable "Complete" button if already done
+        boolean isCompleted = request.getStatus() == util.enums.Status.COMPLETED || 
+                              request.getStatus() == util.enums.Status.CLOSED;
+        btnComplete.setEnabled(!isCompleted);
+        // Add a display for linked requests
+if (!request.getLinkedRequests().isEmpty()) {
+    StringBuilder linkedMsg = new StringBuilder("Related Issues: ");
+    for (model.workQueue.WorkRequest lr : request.getLinkedRequests()) {
+        linkedMsg.append(lr.getRequestId())
+                 .append(" (")
+                 .append(lr.getStatus().getValue())
+                 .append("), ");
+    }
+    // Assume you added a label called 'lblLinked' in the form
+    lblLinked.setText(linkedMsg.toString()); 
+    lblLinked.setForeground(java.awt.Color.BLUE);
+} else {
+    lblLinked.setText("");
+}
     }
 
 }

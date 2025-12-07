@@ -21,6 +21,6 @@ public JPanel createWorkArea(JPanel userProcessContainer,
                              Enterprise enterprise,
                              EcoSystem system) {
 
-    return new SupervisorDashboardJPanel(userProcessContainer, system, account, organization);
+    return new SupervisorDashboardJPanel(userProcessContainer, system, account, enterprise);
 }
 }

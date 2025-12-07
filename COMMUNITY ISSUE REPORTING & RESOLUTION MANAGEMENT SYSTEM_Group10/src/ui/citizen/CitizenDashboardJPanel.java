@@ -14,7 +14,6 @@ import java.awt.*;
  *
  * @author RIO
  */
-
 public class CitizenDashboardJPanel extends javax.swing.JPanel {
 
     /**
@@ -28,7 +27,7 @@ private JPanel userProcessContainer;
   
    
 
-   
+    
    public CitizenDashboardJPanel(JPanel userProcessContainer, EcoSystem system, UserAccount account) {
 this.userProcessContainer = userProcessContainer;
         this.system = system;
@@ -69,6 +68,7 @@ this.userProcessContainer = userProcessContainer;
         workArea = new javax.swing.JPanel();
         lblMainWelcome = new javax.swing.JLabel();
         btnLogout = new javax.swing.JButton();
+        btnInbox = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -105,6 +105,13 @@ this.userProcessContainer = userProcessContainer;
             }
         });
 
+        btnInbox.setText("Inbox");
+        btnInbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnInboxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout sidebarPanelLayout = new javax.swing.GroupLayout(sidebarPanel);
         sidebarPanel.setLayout(sidebarPanelLayout);
         sidebarPanelLayout.setHorizontalGroup(
@@ -113,29 +120,33 @@ this.userProcessContainer = userProcessContainer;
                 .addGap(18, 18, 18)
                 .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(sidebarPanelLayout.createSequentialGroup()
-                        .addComponent(btnReportIssue)
-                        .addGap(0, 315, Short.MAX_VALUE))
+                        .addComponent(lblMainWelcome)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnInbox)
+                        .addContainerGap())
                     .addGroup(sidebarPanelLayout.createSequentialGroup()
-                        .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(btnMyProfile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnTrackIssues, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE))
-                        .addGap(49, 49, 49)
-                        .addComponent(btnLogout)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGap(165, 165, 165)
-                .addComponent(workArea, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(367, 367, 367))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sidebarPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblMainWelcome)
-                .addGap(65, 65, 65))
+                        .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(sidebarPanelLayout.createSequentialGroup()
+                                .addComponent(btnReportIssue)
+                                .addGap(0, 315, Short.MAX_VALUE))
+                            .addGroup(sidebarPanelLayout.createSequentialGroup()
+                                .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(btnMyProfile, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnTrackIssues, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE))
+                                .addGap(49, 49, 49)
+                                .addComponent(btnLogout)))
+                        .addGap(165, 165, 165)
+                        .addComponent(workArea, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(367, 367, 367))))
         );
         sidebarPanelLayout.setVerticalGroup(
             sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sidebarPanelLayout.createSequentialGroup()
                 .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(sidebarPanelLayout.createSequentialGroup()
-                        .addGap(94, 94, 94)
+                        .addGap(16, 16, 16)
+                        .addComponent(lblMainWelcome)
+                        .addGap(59, 59, 59)
                         .addComponent(btnReportIssue)
                         .addGroup(sidebarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(sidebarPanelLayout.createSequentialGroup()
@@ -149,8 +160,8 @@ this.userProcessContainer = userProcessContainer;
                         .addComponent(btnMyProfile))
                     .addGroup(sidebarPanelLayout.createSequentialGroup()
                         .addComponent(workArea, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lblMainWelcome)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnInbox)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -233,8 +244,18 @@ int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
         // TODO add your handling code here:
     }//GEN-LAST:event_btnLogoutActionPerformed
 
+    private void btnInboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInboxActionPerformed
+        // TODO add your handling code here:
+        ui.common.ViewNotificationsJPanel inboxPanel = new ui.common.ViewNotificationsJPanel(userProcessContainer, account);
+    
+    userProcessContainer.add("Inbox", inboxPanel);
+    java.awt.CardLayout layout = (java.awt.CardLayout) userProcessContainer.getLayout();
+    layout.next(userProcessContainer);
+    }//GEN-LAST:event_btnInboxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnInbox;
     private javax.swing.JButton btnLogout;
     private javax.swing.JButton btnMyProfile;
     private javax.swing.JButton btnReportIssue;

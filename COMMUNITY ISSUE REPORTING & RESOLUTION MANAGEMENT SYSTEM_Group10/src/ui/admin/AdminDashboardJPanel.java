@@ -21,14 +21,46 @@ public class AdminDashboardJPanel extends javax.swing.JPanel {
     private String adminType; // "SYSTEM", "NETWORK", "ENTERPRISE", "ORGANIZATION"
 
     public AdminDashboardJPanel(javax.swing.JPanel userProcessContainer, model.ecosystem.EcoSystem ecoSystem, model.userAccount.UserAccount account, String adminType) {
-        this.userProcessContainer = userProcessContainer;
-        this.ecoSystem = ecoSystem;
-        this.userAccount = account;
-        this.adminType = adminType;
-        initComponents();
+    this.userProcessContainer = userProcessContainer;
+    this.ecoSystem = ecoSystem;
+    this.userAccount = account;
+    this.adminType = adminType; // "SYSTEM", "NETWORK", "ENTERPRISE", "ORGANIZATION"
+    
+    initComponents();
+    configureView(); // <--- Call the new method here
+}
+
+private void configureView() {
+    // 1. Hide all buttons by default
+    btnManageNetworks.setVisible(false);
+    btnManageEnterprise.setVisible(false);
+    btnManageOrganization.setVisible(false);
+    btnManageUsers.setVisible(false);
+
+    // 2. Show buttons based on adminType
+    if (adminType != null) {
+        switch (adminType) {
+            case "SYSTEM":
+                btnManageNetworks.setVisible(true);
+                btnManageEnterprise.setVisible(true);
+                btnManageOrganization.setVisible(true);
+                btnManageUsers.setVisible(true);
+                break;
+            case "NETWORK":
+                btnManageEnterprise.setVisible(true);
+                btnManageOrganization.setVisible(true);
+                btnManageUsers.setVisible(true);
+                break;
+            case "ENTERPRISE":
+                btnManageOrganization.setVisible(true);
+                btnManageUsers.setVisible(true);
+                break;
+            case "ORGANIZATION":
+                btnManageUsers.setVisible(true);
+                break;
+        }
     }
-
-
+}
   
 
     /**
