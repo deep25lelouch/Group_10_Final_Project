@@ -25,7 +25,7 @@ public class AdminDashboardJPanel extends javax.swing.JPanel {
     this.ecoSystem = ecoSystem;
     this.userAccount = account;
     this.adminType = adminType; // "SYSTEM", "NETWORK", "ENTERPRISE", "ORGANIZATION"
-    
+    //updated admin login view
     initComponents();
     configureView(); // <--- Call the new method here
 }
